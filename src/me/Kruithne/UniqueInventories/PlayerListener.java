@@ -1,6 +1,7 @@
 package me.Kruithne.UniqueInventories;
 
 import org.bukkit.Server;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -19,8 +20,12 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event)
 	{
+		Player thePlayer = event.getPlayer();
+		
 		this.server.broadcastMessage(event.getPlayer().getName() + " just went from " + event.getFrom().getName() + " to " + event.getPlayer().getWorld().getName());
-		this.inventoryHandler.saveInventory(event.getPlayer());
+		
+		this.inventoryHandler.saveInventory(thePlayer, event.getFrom());
+		this.inventoryHandler.loadInventory(thePlayer, thePlayer.getWorld());
 	}
 	
 }

@@ -17,7 +17,7 @@ public class DatabaseConnection {
      private String user = "minecraft";
      private String password = "HorsePoopRaddishGuilloutine";
      
-     private Logger log = null;
+     public Logger log = null;
      
      public DatabaseConnection(Logger log)
      {
