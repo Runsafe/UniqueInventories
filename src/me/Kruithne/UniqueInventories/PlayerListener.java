@@ -20,7 +20,7 @@ public class PlayerListener implements Listener {
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event)
 	{
 		this.server.broadcastMessage(event.getPlayer().getName() + " just went from " + event.getFrom().getName() + " to " + event.getPlayer().getWorld().getName());
-		
+		this.inventoryHandler.saveInventory(event.getPlayer());
 	}
 	
 }
