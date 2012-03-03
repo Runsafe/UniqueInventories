@@ -8,7 +8,9 @@ public class UniqueInventories extends JavaPlugin {
 	{
 		this.getServer().getPluginManager().registerEvents(
 			new PlayerListener(
-				new InventoryHandler()
+				new InventoryHandler(),
+				this.getServer()
+				
 			),
 			this
 		);
