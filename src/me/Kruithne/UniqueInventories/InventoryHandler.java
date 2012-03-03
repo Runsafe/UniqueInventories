@@ -34,10 +34,15 @@ public class InventoryHandler {
 		ArrayList<String> itemData = new ArrayList<String>();
 		Iterator<ItemStack> itemStackIterator = playerInventory.iterator();
 		
+		int currentIndex = 0;
 		while (itemStackIterator.hasNext())
-		{
+		{	
 			ItemStack theItem = itemStackIterator.next();
-			itemData.add(String.format("%s:%s:%s:%s", theItem.getTypeId(), theItem.getAmount(), theItem.getDurability(), theItem.getData().getData()));
+			if (theItem != null)
+			{
+				itemData.add(String.format("%s:%s:%s:%s:%s", currentIndex, theItem.getTypeId(), theItem.getAmount(), theItem.getDurability(), theItem.getData().getData()));
+			}
+			currentIndex++;
 		}
 		
 		return Join(itemData, ",");
