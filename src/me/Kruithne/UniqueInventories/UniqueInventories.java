@@ -1,23 +1,24 @@
 package me.Kruithne.UniqueInventories;
 
-import java.util.logging.Logger;
-
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class UniqueInventories extends JavaPlugin {
+
+	public PlayerListener playerListener = null;
 	
 	public void onEnable()
 	{
+		this.playerListener = new PlayerListener(this);
+		
 		this.getServer().getPluginManager().registerEvents(
-			new PlayerListener(
-				new InventoryHandler(
-					new DatabaseConnection(Logger.getLogger("Minecraft"))
-				),
-				this.getServer()
-				
-			),
+			this.playerListener,
 			this
 		);
+	}
+	
+	public void onDisable()
+	{
+		this.playerListener.onServerClosing();
 	}
 
 }
