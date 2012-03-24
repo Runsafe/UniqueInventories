@@ -35,7 +35,7 @@ public class InventoryHandler {
 		
 		this.database.query(
 			String.format(
-				"INSERT INTO uniqueInventories (playerName, worldName, inventory, experience, level, armor) VALUES('%s', '%s', '%s', %s, %s, '%s') ON DUPLICATE KEY UPDATE experience = %4$s, inventory = '%3$s', level = %5$s, armor = '%6$s', saved = 1", 
+				"INSERT INTO uniqueInventories (playerName, worldName, inventory, experience, level, armor) VALUES('%s', '%s', '%s', %s, %s, '%s') ON DUPLICATE KEY UPDATE experience = %4$s, inventory = '%3$s', level = %5$s, armor = '%6$s'", 
 				player.getName(),
 				worldName,
 				this.flatPackInventory(player),
@@ -83,23 +83,7 @@ public class InventoryHandler {
 	
 	public void loadInventory(Player player, World theWorld)
 	{
-		ResultSet checkSave = this.database.getQuery(String.format("SELECT saved FROM uniqueInventories WHERE playerName = '%s' AND worldName = '%s'", player.getName(), theWorld.getName()));	
-			
-		try
-		{
-			if (checkSave.next())
-			{
-				if (checkSave.getInt("saved") == 1)
-				{
-					this.resetPlayersInventory(player);
-				}
-
-			}
-		}
-		catch (SQLException e)
-		{
-			this.database.log.log(Level.SEVERE, String.format("SQL Error: %s", e.getMessage()));
-		}
+		this.resetPlayersInventory(player);
 		
 		String worldName = theWorld.getName();
 		
@@ -123,7 +107,7 @@ public class InventoryHandler {
 				player.setExp(storedData.getFloat("experience"));
 				player.setLevel(storedData.getInt("level"));
 				this.unPackToInventory(storedData.getString("inventory"), storedData.getString("armor"), player);
-				this.database.query(String.format("UPDATE uniqueInventories SET saved = 0 WHERE playerName = '%s' AND worldName = '%s'", player.getName(), worldName));
+				//this.database.query(String.format("UPDATE uniqueInventories SET saved = 0 WHERE playerName = '%s' AND worldName = '%s'", player.getName(), worldName));
 				
 			}
 		}

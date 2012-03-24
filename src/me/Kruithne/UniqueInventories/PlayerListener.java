@@ -75,7 +75,7 @@ public class PlayerListener implements Listener {
 		    	limitedPlayers.remove(player.getName());
 		    }
 		    
-		}, 1L);
+		}, 2L);
 	}
 	
 }
