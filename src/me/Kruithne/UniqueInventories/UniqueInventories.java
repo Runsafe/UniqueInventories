@@ -1,24 +1,46 @@
 package me.Kruithne.UniqueInventories;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import java.io.InputStream;
 
-public class UniqueInventories extends JavaPlugin {
+import no.runsafe.framework.IConfigurationDefaults;
+import no.runsafe.framework.IConfigurationFile;
+import no.runsafe.framework.IDatabaseTypeProvider;
+import no.runsafe.framework.RunsafePlugin;
+
+public class UniqueInventories extends RunsafePlugin implements IConfigurationFile, IConfigurationDefaults, IDatabaseTypeProvider {
 
 	public PlayerListener playerListener = null;
 	
-	public void onEnable()
+	@Override
+	protected void PluginSetup() 
 	{
-		this.playerListener = new PlayerListener(this);
-		
-		this.getServer().getPluginManager().registerEvents(
-			this.playerListener,
-			this
-		);
+		addComponent(InventoryHandler.class);
+		addComponent(PlayerListener.class);
+		this.playerListener = this.container.getComponent(PlayerListener.class);
 	}
-	
+
+	@Override
 	public void onDisable()
 	{
 		this.playerListener.onServerClosing();
 	}
 
+	@Override
+	public String getConfigurationPath() 
+	{
+		return "plugins/" + this.getName() + "/config.yml";
+	}
+
+	@Override
+	public InputStream getDefaultConfiguration() 
+	{
+		return getResource("defaults.yml");
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Class[] getModelClasses() 
+	{
+		return new Class[] { InventoryStorage.class };
+	}
 }

@@ -1,7 +1,8 @@
 package me.Kruithne.UniqueInventories;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
+
+import no.runsafe.framework.IScheduler;
 
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -15,16 +16,16 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerListener implements Listener {
 	
-	private UniqueInventories plugin = null;
 	private InventoryHandler inventoryHandler = null;
 	private Server server = null;
 	private ArrayList<String> limitedPlayers = new ArrayList<String>();
+	private IScheduler scheduler;
 
-	PlayerListener(UniqueInventories plugin)
+	public PlayerListener(Server server, IScheduler scheduler, InventoryHandler inventoryHandler)
 	{
-		this.plugin = plugin;
-		this.server = this.plugin.getServer();
-		this.inventoryHandler = new InventoryHandler(new DatabaseConnection(Logger.getLogger("Minecraft")));
+		this.server = server;
+		this.inventoryHandler = inventoryHandler;
+		this.scheduler = scheduler;
 	}
 	
 	@EventHandler
@@ -54,7 +55,6 @@ public class PlayerListener implements Listener {
 		this.inventoryHandler.saveAllInventories(this.server);
 	}
 	
-	
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event)
 	{
@@ -69,13 +69,15 @@ public class PlayerListener implements Listener {
 	private void updateInventory(final Player player)
 	{
 		this.limitedPlayers.add(player.getName());
-		this.server.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-		    public void run() {
-		    	inventoryHandler.loadInventory(player, player.getWorld());
-		    	limitedPlayers.remove(player.getName());
-		    }
-		    
-		}, 2L);
+		this.scheduler.setTimedEvent(
+			new Runnable() {
+				public void run() {
+					inventoryHandler.loadInventory(player, player.getWorld());
+					limitedPlayers.remove(player.getName());
+				}
+		    }, 
+		    2L
+		);
 	}
 	
 }

@@ -1,12 +1,11 @@
 package me.Kruithne.UniqueInventories;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
+
+import no.runsafe.framework.IDatabase;
 
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -17,9 +16,9 @@ import org.bukkit.material.MaterialData;
 
 public class InventoryHandler {
 
-	private DatabaseConnection database = null;
+	private IDatabase database = null;
 	
-	InventoryHandler(DatabaseConnection database)
+	public InventoryHandler(IDatabase database)
 	{
 		this.database = database;
 	}
@@ -32,18 +31,15 @@ public class InventoryHandler {
 		{
 			worldName = "world";
 		}
-		
-		this.database.query(
-			String.format(
-				"INSERT INTO uniqueInventories (playerName, worldName, inventory, experience, level, armor) VALUES('%s', '%s', '%s', %s, %s, '%s') ON DUPLICATE KEY UPDATE experience = %4$s, inventory = '%3$s', level = %5$s, armor = '%6$s'", 
-				player.getName(),
-				worldName,
-				this.flatPackInventory(player),
-				player.getExp(),
-				player.getLevel(),
-				this.flatPackArmor(player)
-			)
-		);
+
+		InventoryStorage storage = new InventoryStorage();
+		storage.setPlayerName(player.getName());
+		storage.setWorldName(worldName);
+		storage.setInventory(this.flatPackInventory(player));
+		storage.setExperience(player.getExp());
+		storage.setLevel(player.getLevel());
+		storage.setArmor(this.flatPackArmor(player));
+		this.database.getSession().persist(storage);
 	}
 	
 	public void saveAllInventories(Server server)
@@ -63,6 +59,7 @@ public class InventoryHandler {
 				this.saveInventory(player, world);
 			}
 		}
+		this.database.getSession().flush();
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -92,28 +89,16 @@ public class InventoryHandler {
 			worldName = "world";
 		}
 		
-		ResultSet storedData = this.database.getQuery(
-			String.format(
-				"SELECT inventory, experience, level, armor FROM uniqueInventories WHERE playerName = '%s' AND worldName = '%s'",
-				player.getName(),
-				worldName
-			)
-		);	
+		InventoryStorage stored = (InventoryStorage)database.getSession().get(
+			InventoryStorage.class, 
+			new InventoryKey(player.getName(), worldName)
+		);
 		
-		try
+		if(stored != null)
 		{
-			if (storedData.next())
-			{
-				player.setExp(storedData.getFloat("experience"));
-				player.setLevel(storedData.getInt("level"));
-				this.unPackToInventory(storedData.getString("inventory"), storedData.getString("armor"), player);
-				//this.database.query(String.format("UPDATE uniqueInventories SET saved = 0 WHERE playerName = '%s' AND worldName = '%s'", player.getName(), worldName));
-				
-			}
-		}
-		catch (SQLException e)
-		{
-			this.database.log.log(Level.SEVERE, String.format("SQL Error: %s", e.getMessage()));
+			player.setExp(stored.getExperience());
+			player.setLevel(stored.getLevel());
+			this.unPackToInventory(stored.getInventory(), stored.getArmor(), player);
 		}
 	}
 	
