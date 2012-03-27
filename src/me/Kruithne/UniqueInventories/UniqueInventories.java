@@ -24,6 +24,7 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 	@Override
 	public void onDisable()
 	{
+		super.onDisable();
 		this.playerListener.onServerClosing();
 	}
 
