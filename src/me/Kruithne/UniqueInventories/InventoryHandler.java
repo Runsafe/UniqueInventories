@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import no.runsafe.framework.IDatabase;
+import no.runsafe.framework.IRepository;
 
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -16,11 +16,11 @@ import org.bukkit.material.MaterialData;
 
 public class InventoryHandler {
 
-	private IDatabase database = null;
+	private IRepository<InventoryStorage, Player> repository = null;
 	
-	public InventoryHandler(IDatabase database)
+	public InventoryHandler(IRepository<InventoryStorage, Player> repository)
 	{
-		this.database = database;
+		this.repository = repository;
 	}
 	
 	public void saveInventory(Player player, World theWorld)
@@ -39,7 +39,7 @@ public class InventoryHandler {
 		storage.setExperience(player.getExp());
 		storage.setLevel(player.getLevel());
 		storage.setArmor(this.flatPackArmor(player));
-		this.database.getSession().persist(storage);
+		this.repository.persist(storage);
 	}
 	
 	public void saveAllInventories(Server server)
@@ -59,7 +59,6 @@ public class InventoryHandler {
 				this.saveInventory(player, world);
 			}
 		}
-		this.database.getSession().flush();
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -89,10 +88,11 @@ public class InventoryHandler {
 			worldName = "world";
 		}
 		
-		InventoryStorage stored = (InventoryStorage)database.getSession().get(
-			InventoryStorage.class, 
-			new InventoryKey(player.getName(), worldName)
-		);
+		InventoryStorage stored = this.repository.get(player); 
+//				(InventoryStorage)database.getSession().get(
+//			InventoryStorage.class, 
+//			new InventoryKey(player.getName(), worldName)
+//		);
 		
 		if(stored != null)
 		{
@@ -110,7 +110,7 @@ public class InventoryHandler {
 		//index, ID, amount, dura, data, helmet, chestplate, leggings, boots
 		HashMap<Integer, ItemStack> itemStacks = new HashMap<Integer, ItemStack>();
 		
-		if (!packedInventory.isEmpty())
+		if (packedInventory != null && !packedInventory.isEmpty())
 		{
 			String[] items = packedInventory.split(",");
 			
@@ -172,7 +172,7 @@ public class InventoryHandler {
 	
 	private void unpackArmorToPlayer(String armorImport, Player player)
 	{
-		if (!armorImport.isEmpty())
+		if (armorImport != null && !armorImport.isEmpty())
 		{
 			String[] armorItems = armorImport.split(",");
 			

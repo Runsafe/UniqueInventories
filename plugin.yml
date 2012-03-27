@@ -3,3 +3,9 @@ main: me.Kruithne.UniqueInventories.UniqueInventories
 version: 1.0
 author: Kruithne
 description: Allows multiple inventories accross worlds.
+commands:
+  uniqueinv:
+    description: Unique Inventories commands
+    usage: /uniqueinv debug <level>
+    permission: uniqueinventories.debug
+    aliases: [uid]

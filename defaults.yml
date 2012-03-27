@@ -1,9 +1,11 @@
 # Default config.yml
 
-database.dialect: MySQLDialect
-database.driver: com.mysql.jdbc.Driver
-database.url: jdbc:mysql://localhost:3306/database
-database.username: username
-database.password: password
+database:
+  url: jdbc:mysql://localhost:3306/database
+  username: username
+  password: password
 groupedInventories:
-- world,world_nether,world_the_end
+  survival:
+    - world
+    - world_nether
+    - world_the_end

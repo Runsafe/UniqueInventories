@@ -1,17 +1,9 @@
 package me.Kruithne.UniqueInventories;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
+import no.runsafe.framework.RunsafeEntity;
 
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Table;
-
-@DynamicUpdate
-@Table(appliesTo = "uniqueInventories")
-public class InventoryStorage {
-
-	@Id
-	@Column(name = "playerName")
+public class InventoryStorage extends RunsafeEntity
+{
 	public String getPlayerName()
 	{
 		return playerName;
@@ -22,8 +14,6 @@ public class InventoryStorage {
 		this.playerName = playerName;
 	}
 	
-	@Id
-	@Column(name = "worldName")
 	public String getWorldName()
 	{
 		return worldName;
@@ -34,7 +24,6 @@ public class InventoryStorage {
 		this.worldName = worldName;
 	}
 	
-	@Column(name = "inventory", nullable = false)
 	public String getInventory()
 	{
 		return inventory;
@@ -45,7 +34,6 @@ public class InventoryStorage {
 		this.inventory = inventory;
 	}
 
-	@Column(name = "experience", nullable = false)
 	public float getExperience()
 	{
 		return experience;
@@ -56,7 +44,6 @@ public class InventoryStorage {
 		this.experience = experience;
 	}
 	
-	@Column(name = "level", nullable = false)
 	public int getLevel()
 	{
 		return level;
@@ -67,7 +54,6 @@ public class InventoryStorage {
 		this.level = level;
 	}
 	
-	@Column(name = "armor")
 	public String getArmor()
 	{
 		return armor;
@@ -77,7 +63,7 @@ public class InventoryStorage {
 	{
 		this.armor = armor;
 	}
-	
+
 	private String playerName;
 	private String worldName;
 	private String inventory;

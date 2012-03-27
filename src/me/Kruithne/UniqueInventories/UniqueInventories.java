@@ -16,6 +16,8 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 	{
 		addComponent(InventoryHandler.class);
 		addComponent(PlayerListener.class);
+		addComponent(InventoryRepository.class);
+		addComponent(DebugCommand.class);
 		this.playerListener = this.container.getComponent(PlayerListener.class);
 	}
 
