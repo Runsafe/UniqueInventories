@@ -2,6 +2,7 @@ package me.Kruithne.UniqueInventories;
 
 import java.util.ArrayList;
 
+import no.runsafe.framework.IPluginDisabled;
 import no.runsafe.framework.IScheduler;
 
 import org.bukkit.Server;
@@ -14,7 +15,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class PlayerListener implements Listener {
+public class PlayerListener implements Listener, IPluginDisabled {
 	
 	private InventoryHandler inventoryHandler = null;
 	private Server server = null;
@@ -50,7 +51,7 @@ public class PlayerListener implements Listener {
 		this.updateInventory(event.getPlayer());	
 	}
 	
-	public void onServerClosing()
+	public void OnPluginDisabled()
 	{
 		this.inventoryHandler.saveAllInventories(this.server);
 	}

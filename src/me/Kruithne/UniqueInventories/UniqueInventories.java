@@ -4,10 +4,9 @@ import java.io.InputStream;
 
 import no.runsafe.framework.IConfigurationDefaults;
 import no.runsafe.framework.IConfigurationFile;
-import no.runsafe.framework.IDatabaseTypeProvider;
 import no.runsafe.framework.RunsafePlugin;
 
-public class UniqueInventories extends RunsafePlugin implements IConfigurationFile, IConfigurationDefaults, IDatabaseTypeProvider {
+public class UniqueInventories extends RunsafePlugin implements IConfigurationFile, IConfigurationDefaults {
 
 	public PlayerListener playerListener = null;
 	
@@ -18,14 +17,6 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 		addComponent(PlayerListener.class);
 		addComponent(InventoryRepository.class);
 		addComponent(DebugCommand.class);
-		this.playerListener = this.container.getComponent(PlayerListener.class);
-	}
-
-	@Override
-	public void onDisable()
-	{
-		super.onDisable();
-		this.playerListener.onServerClosing();
 	}
 
 	@Override
@@ -38,12 +29,5 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 	public InputStream getDefaultConfiguration() 
 	{
 		return getResource("defaults.yml");
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Class[] getModelClasses() 
-	{
-		return new Class[] { InventoryStorage.class };
 	}
 }
