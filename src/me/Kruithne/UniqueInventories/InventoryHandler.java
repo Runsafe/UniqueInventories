@@ -118,14 +118,15 @@ public class InventoryHandler {
 			{
 				if (!items[i].isEmpty())
 				{
-					String[] itemData = items[i].split(":");
-					int itemID = Integer.parseInt(itemData[1]);
+					String[] slotData = items[i].split("&");
+					String[] itemData = slotData[1].split(":");
+					int itemID = Integer.parseInt(itemData[0]);
 					ItemStack itemStack = new ItemStack(itemID);
-					itemStack.setAmount(Integer.parseInt(itemData[2]));
-					itemStack.setDurability(Short.parseShort(itemData[3]));
-					itemStack.setData(new MaterialData(itemID, Byte.parseByte(itemData[4])));
+					itemStack.setAmount(Integer.parseInt(itemData[1]));
+					itemStack.setDurability(Short.parseShort(itemData[2]));
+					itemStack.setData(new MaterialData(itemID, Byte.parseByte(itemData[3])));
 					
-					itemStacks.put(Integer.parseInt(itemData[0]), itemStack);
+					itemStacks.put(Integer.parseInt(slotData[0]), itemStack);
 				}
 			}
 		}

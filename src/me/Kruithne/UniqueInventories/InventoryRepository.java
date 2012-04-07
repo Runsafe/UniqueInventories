@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 
 import no.runsafe.framework.interfaces.IConfiguration;
@@ -24,7 +25,14 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 		
 		ConfigurationSection grouping = config.getSection("groupedInventories");
 		groupedInventories = new HashMap<String, String>();
-		for(String universe : grouping.getKeys(true))
+		if(grouping == null)
+			return;
+		
+		Set<String> universes = grouping.getKeys(true);
+		if(universes == null)
+			return;
+		
+		for(String universe : universes)
 		{
 			for(String world : grouping.getStringList(universe))
 			{
@@ -99,6 +107,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 			update.setFloat(4, inventory.getExperience());
 			update.setString(5, inventory.getPlayerName());
 			update.setString(6, getInventoryName(inventory.getWorldName()));
+			update.execute();
 		}
 		catch(SQLException e)
 		{
