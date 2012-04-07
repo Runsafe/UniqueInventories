@@ -2,8 +2,8 @@ package me.Kruithne.UniqueInventories;
 
 import java.util.ArrayList;
 
-import no.runsafe.framework.IPluginDisabled;
-import no.runsafe.framework.IScheduler;
+import no.runsafe.framework.interfaces.IPluginDisabled;
+import no.runsafe.framework.interfaces.IScheduler;
 
 import org.bukkit.Server;
 import org.bukkit.World;

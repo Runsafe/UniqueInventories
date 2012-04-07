@@ -1,6 +1,6 @@
 package me.Kruithne.UniqueInventories;
 
-import no.runsafe.framework.RunsafeEntity;
+import no.runsafe.framework.database.RunsafeEntity;
 
 public class InventoryStorage extends RunsafeEntity
 {

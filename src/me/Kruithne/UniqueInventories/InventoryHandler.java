@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import no.runsafe.framework.IRepository;
+import no.runsafe.framework.interfaces.IRepository;
 
 import org.bukkit.Server;
 import org.bukkit.World;
