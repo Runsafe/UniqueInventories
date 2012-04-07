@@ -6,13 +6,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
+import no.runsafe.framework.interfaces.IConfiguration;
+import no.runsafe.framework.interfaces.IDatabase;
+import no.runsafe.framework.interfaces.IOutput;
+import no.runsafe.framework.interfaces.IRepository;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import no.runsafe.framework.IConfiguration;
-import no.runsafe.framework.IDatabase;
-import no.runsafe.framework.IOutput;
-import no.runsafe.framework.IRepository;
 
 public class InventoryRepository implements IRepository<InventoryStorage, Player> 
 {

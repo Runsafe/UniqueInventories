@@ -3,11 +3,11 @@ package me.Kruithne.UniqueInventories;
 import java.util.List;
 import java.util.logging.Level;
 
+import no.runsafe.framework.command.RunsafeCommandHandler;
+import no.runsafe.framework.interfaces.IOutput;
+
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-
-import no.runsafe.framework.IOutput;
-import no.runsafe.framework.RunsafeCommandHandler;
 
 public class DebugCommand extends RunsafeCommandHandler 
 {
