@@ -5,7 +5,3 @@ database:
   username: username
   password: password
 groupedInventories:
-  survival:
-    - world
-    - world_nether
-    - world_the_end

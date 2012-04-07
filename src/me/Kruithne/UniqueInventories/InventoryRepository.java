@@ -80,15 +80,15 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 	{
 		try
 		{
-			this.output.outputDebugToConsole(
-				String.format(
-					"Saving player %s in world %s (%s)", 
-					inventory.getPlayerName(), 
-					inventory.getWorldName(), 
-					inventory.getInventory()
-				),
-				Level.FINE
-			);
+			//this.output.outputToConsole(
+			//	String.format(
+			//		"Saving player %s in world %s (%s)", 
+				//	inventory.getPlayerName(), 
+				//	inventory.getWorldName(), 
+				//	inventory.getInventory()
+				//),
+				//Level.FINE
+			//);
 			PreparedStatement update = this.database.prepare(
 				"UPDATE uniqueInventories SET armor=?, inventory=?, level=?, experience=? WHERE playerName=? AND inventoryName=?"
 			);
@@ -98,6 +98,8 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 			update.setFloat(4, inventory.getExperience());
 			update.setString(5, inventory.getPlayerName());
 			update.setString(6, getInventoryName(inventory.getWorldName()));
+			
+			update.execute();
 		}
 		catch(SQLException e)
 		{
