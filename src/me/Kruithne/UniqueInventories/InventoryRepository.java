@@ -15,7 +15,6 @@ import no.runsafe.framework.interfaces.IRepository;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-
 public class InventoryRepository implements IRepository<InventoryStorage, Player> 
 {
 	public InventoryRepository(IDatabase database, IOutput output, IConfiguration config)
@@ -89,15 +88,15 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 	{
 		try
 		{
-			this.output.outputDebugToConsole(
-				String.format(
-					"Saving player %s in world %s (%s)", 
-					inventory.getPlayerName(), 
-					inventory.getWorldName(), 
-					inventory.getInventory()
-				),
-				Level.FINE
-			);
+			//this.output.outputToConsole(
+			//	String.format(
+			//		"Saving player %s in world %s (%s)", 
+				//	inventory.getPlayerName(), 
+				//	inventory.getWorldName(), 
+				//	inventory.getInventory()
+				//),
+				//Level.FINE
+			//);
 			PreparedStatement update = this.database.prepare(
 				"UPDATE uniqueInventories SET armor=?, inventory=?, level=?, experience=? WHERE playerName=? AND inventoryName=?"
 			);

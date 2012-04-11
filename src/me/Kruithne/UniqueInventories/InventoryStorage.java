@@ -63,6 +63,16 @@ public class InventoryStorage extends RunsafeEntity
 	{
 		this.armor = armor;
 	}
+	
+	public boolean getSaved()
+	{
+		return saved;
+	}
+	
+	public void setSaved(boolean saved)
+	{
+		this.saved = saved;
+	}
 
 	private String playerName;
 	private String worldName;
@@ -70,4 +80,5 @@ public class InventoryStorage extends RunsafeEntity
 	private float experience;
 	private int level;
 	private String armor;
+	private boolean saved;
 }

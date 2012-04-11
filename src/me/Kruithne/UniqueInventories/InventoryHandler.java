@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import no.runsafe.framework.interfaces.IRepository;
 
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -25,20 +29,14 @@ public class InventoryHandler {
 	
 	public void saveInventory(Player player, World theWorld)
 	{
-		String worldName = theWorld.getName();
-		
-		if (worldName.equals("world_nether"))
-		{
-			worldName = "world";
-		}
-
 		InventoryStorage storage = new InventoryStorage();
 		storage.setPlayerName(player.getName());
-		storage.setWorldName(worldName);
+		storage.setWorldName(theWorld.getName());
 		storage.setInventory(this.flatPackInventory(player));
 		storage.setExperience(player.getExp());
 		storage.setLevel(player.getLevel());
 		storage.setArmor(this.flatPackArmor(player));
+		storage.setSaved(true);
 		this.repository.persist(storage);
 	}
 	
@@ -64,6 +62,9 @@ public class InventoryHandler {
 	@SuppressWarnings("deprecation")
 	public void resetPlayersInventory(Player player)
 	{
+		if(player == null || player.getInventory() == null)
+			return;
+		
 		player.setExp(0.0F);
 		player.setLevel(0);
 		ItemStack[] armorReset = {
@@ -79,28 +80,60 @@ public class InventoryHandler {
 	
 	public void loadInventory(Player player, World theWorld)
 	{
-		this.resetPlayersInventory(player);
-		
-		String worldName = theWorld.getName();
-		
-		if (worldName.equals("world_nether"))
-		{
-			worldName = "world";
-		}
-		
 		InventoryStorage stored = this.repository.get(player); 
-//				(InventoryStorage)database.getSession().get(
-//			InventoryStorage.class, 
-//			new InventoryKey(player.getName(), worldName)
-//		);
+		
+		if(!stored.getSaved())
+			return;
+		
+		this.resetPlayersInventory(player);
 		
 		if(stored != null)
 		{
 			player.setExp(stored.getExperience());
 			player.setLevel(stored.getLevel());
 			this.unPackToInventory(stored.getInventory(), stored.getArmor(), player);
+			stored.setSaved(false);
+			this.repository.persist(stored);
 		}
 	}
+	
+	private String flattenEnchants(Map<Enchantment, Integer> enchants)
+    {
+        if(!enchants.isEmpty())
+        {
+            ArrayList<String> enchantStrings = new ArrayList<String>();
+            Set<Enchantment> enchantKeys = enchants.keySet();
+            
+            Iterator<Enchantment> keysIterator = enchantKeys.iterator();
+            
+            while (keysIterator.hasNext())
+            {
+            	Enchantment theEnchant = (Enchantment) keysIterator.next();
+                int enchantData = (Integer)enchants.get(theEnchant);
+            	enchantStrings.add(String.format("%s#%s", theEnchant.getId(), enchantData));
+            }
+
+            return Join(enchantStrings, "@");
+        }
+        else
+        {
+            return "0";
+        }
+    }
+	
+	private Map<Enchantment, Integer> unpackEnchants(String enchantString)
+    {
+        Map<Enchantment, Integer> returnEnchants = new HashMap<Enchantment, Integer>();
+        String enchantSplit[] = enchantString.split("@");
+        for(int i = 0; i < enchantSplit.length; i++)
+        {
+            String enchantData[] = enchantSplit[i].split("#");
+            Enchantment enchant = new EnchantmentWrapper(Integer.parseInt(enchantData[0]));
+            returnEnchants.put(enchant, Integer.valueOf(Integer.parseInt(enchantData[1])));
+        }
+
+        return returnEnchants;
+    }
 	
 	@SuppressWarnings("deprecation")
 	private void unPackToInventory(String packedInventory, String packedArmor, Player player)
@@ -116,17 +149,11 @@ public class InventoryHandler {
 			
 			for (int i = 0; i < items.length; i++)
 			{
+				//0&61:22:0:0:0
 				if (!items[i].isEmpty())
 				{
-					String[] slotData = items[i].split("&");
-					String[] itemData = slotData[1].split(":");
-					int itemID = Integer.parseInt(itemData[0]);
-					ItemStack itemStack = new ItemStack(itemID);
-					itemStack.setAmount(Integer.parseInt(itemData[1]));
-					itemStack.setDurability(Short.parseShort(itemData[2]));
-					itemStack.setData(new MaterialData(itemID, Byte.parseByte(itemData[3])));
-					
-					itemStacks.put(Integer.parseInt(slotData[0]), itemStack);
+					String[] itemObject = items[i].split("&");
+					itemStacks.put(Integer.parseInt(itemObject[0]), this.unpackItem(itemObject[1]));
 				}
 			}
 		}
@@ -150,25 +177,47 @@ public class InventoryHandler {
 		player.updateInventory();
 	}
 	
+	private ItemStack unpackItem(String itemString)
+	{
+		String[] itemData = itemString.split(":");
+		int itemID = Integer.parseInt(itemData[0]);
+		ItemStack itemStack = new ItemStack(itemID);
+		itemStack.setAmount(Integer.parseInt(itemData[1]));
+		itemStack.setDurability(Short.parseShort(itemData[2]));
+		itemStack.setData(new MaterialData(itemID, Byte.parseByte(itemData[3])));
+		
+		// Backwards compatibility check
+		if (itemData.length > 4 && !itemData[4].equals("0"))
+			itemStack.addEnchantments(unpackEnchants(itemData[4]));
+		
+		return itemStack;
+	}
+	
+	private String flattenItem(ItemStack theItem)
+	{
+		//0&61:22:0:0:0
+		//SlotID & ItemID:Amount:Durability:Data:Enchants
+		
+		int itemID = theItem.getTypeId();
+        int itemAmount = theItem.getAmount();
+        int durability = theItem.getDurability();
+        byte data = theItem.getData().getData();
+        String enchants = flattenEnchants(theItem.getEnchantments());
+        
+        return String.format("%s:%s:%s:%s:%s", itemID, itemAmount, durability, data, enchants);
+	}
+	
 	private String flatPackArmor(Player player)
 	{
 		ItemStack[] armor = player.getInventory().getArmorContents();
+		ArrayList<String> prePackedArmor = new ArrayList<String>();
 		
-		return String.format(
-			"%s:%s:%s,%s:%s:%s,%s:%s:%s,%s:%s:%s",
-			armor[0].getTypeId(),
-			armor[0].getDurability(),
-			armor[0].getData().getData(),
-			armor[1].getTypeId(),
-			armor[1].getDurability(),
-			armor[1].getData().getData(),
-			armor[2].getTypeId(),
-			armor[2].getDurability(),
-			armor[2].getData().getData(),
-			armor[3].getTypeId(),
-			armor[3].getDurability(),
-			armor[3].getData().getData()
-		);
+		for (int i = 0; i < armor.length; i++)
+		{
+			prePackedArmor.add(String.format("%s&%s", i, flattenItem(armor[i])));
+		}
+		
+		return Join(prePackedArmor, ",");
 	}
 	
 	private void unpackArmorToPlayer(String armorImport, Player player)
@@ -176,29 +225,17 @@ public class InventoryHandler {
 		if (armorImport != null && !armorImport.isEmpty())
 		{
 			String[] armorItems = armorImport.split(",");
+			ItemStack[] armorPack = new ItemStack[4];
 			
-			ItemStack[] armorPack = {
-				this.compactArmorItem(armorItems[0]),
-				this.compactArmorItem(armorItems[1]),
-				this.compactArmorItem(armorItems[2]),
-				this.compactArmorItem(armorItems[3])
-			};
+			for (int i = 0; i < armorItems.length; i++)
+			{
+				String[] armorObject = armorItems[i].split("&");
+				
+				armorPack[Integer.parseInt(armorObject[0])] = this.unpackItem(armorObject[1]);
+			}
 			
 			player.getInventory().setArmorContents(armorPack);
 		}
-	}
-	
-	private ItemStack compactArmorItem(String armorDataRaw)
-	{
-		String[] armorData = armorDataRaw.split(":");
-		
-		int itemID = Integer.parseInt(armorData[0]);
-		ItemStack armorItem = new ItemStack(itemID);
-		armorItem.setDurability(Short.parseShort(armorData[1]));
-		MaterialData armorMatData = new MaterialData(itemID);
-		armorMatData.setData(Byte.parseByte(armorData[2]));
-		armorItem.setData(armorMatData);
-		return armorItem;
 	}
 	
 	private String flatPackInventory(Player player)
@@ -212,18 +249,10 @@ public class InventoryHandler {
 		while (itemStackIterator.hasNext())
 		{	
 			ItemStack theItem = itemStackIterator.next();
+			
 			if (theItem != null)
 			{
-				itemData.add(
-					String.format(
-						"%s:%s:%s:%s:%s",
-						currentIndex,
-						theItem.getTypeId(),
-						theItem.getAmount(),
-						theItem.getDurability(),
-						theItem.getData().getData()
-					)
-				);
+				itemData.add(String.format("%s&%s", currentIndex, flattenItem(theItem)));
 			}
 			currentIndex++;
 		}
