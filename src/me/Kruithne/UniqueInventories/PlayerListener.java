@@ -1,9 +1,5 @@
 package me.Kruithne.UniqueInventories;
 
-import java.util.ArrayList;
-
-import no.runsafe.framework.event.subscriber.IPluginDisabled;
-
 import no.runsafe.framework.timer.IScheduler;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -12,31 +8,35 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
-public class PlayerListener implements Listener, IPluginDisabled
+import java.util.ArrayList;
+
+public class PlayerListener implements Listener
 {
-	
 	private InventoryHandler inventoryHandler = null;
 	private Server server = null;
 	private ArrayList<String> limitedPlayers = new ArrayList<String>();
 	private IScheduler scheduler;
+	private IUniverses universes;
 
-	public PlayerListener(Server server, IScheduler scheduler, InventoryHandler inventoryHandler)
+	public PlayerListener(Server server, IScheduler scheduler, InventoryHandler inventoryHandler, IUniverses universes)
 	{
 		this.server = server;
 		this.inventoryHandler = inventoryHandler;
 		this.scheduler = scheduler;
+		this.universes = universes;
 	}
-	
+
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event)
 	{
-		this.saveInventory(event.getPlayer(), event.getFrom());
-		this.updateInventory(event.getPlayer());	
+		if (this.universes.isDifferentUniverse(event.getPlayer().getWorld(), event.getFrom()))
+		{
+			this.saveInventory(event.getPlayer(), event.getFrom());
+			this.updateInventory(event.getPlayer());
+		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent event)
 	{
@@ -45,41 +45,26 @@ public class PlayerListener implements Listener, IPluginDisabled
 			event.setCancelled(true);
 		}
 	}
-	
-	@EventHandler
-	public void onPlayerLogin(PlayerLoginEvent event)
-	{
-		this.updateInventory(event.getPlayer());	
-	}
-	
-	public void OnPluginDisabled()
-	{
-		this.inventoryHandler.saveAllInventories(this.server);
-	}
-	
-	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event)
-	{
-		this.saveInventory(event.getPlayer(), event.getPlayer().getWorld());
-	}
-	
+
 	private void saveInventory(Player player, World fromWorld)
 	{
 		this.inventoryHandler.saveInventory(player, fromWorld);
 	}
-	
+
 	private void updateInventory(final Player player)
 	{
 		this.limitedPlayers.add(player.getName());
 		this.scheduler.setTimedEvent(
-			new Runnable() {
-				public void run() {
+			new Runnable()
+			{
+				public void run()
+				{
 					inventoryHandler.loadInventory(player, player.getWorld());
 					limitedPlayers.remove(player.getName());
 				}
-		    }, 
-		    2L
+			},
+			2L
 		);
 	}
-	
+
 }
