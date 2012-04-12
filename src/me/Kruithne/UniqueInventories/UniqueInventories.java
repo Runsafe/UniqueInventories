@@ -1,10 +1,12 @@
 package me.Kruithne.UniqueInventories;
 
 import java.io.InputStream;
+import java.util.logging.Level;
 
 import no.runsafe.framework.RunsafePlugin;
 import no.runsafe.framework.configuration.IConfigurationDefaults;
 import no.runsafe.framework.configuration.IConfigurationFile;
+import no.runsafe.framework.output.IOutput;
 
 public class UniqueInventories extends RunsafePlugin implements IConfigurationFile, IConfigurationDefaults
 {
@@ -18,6 +20,7 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 		addComponent(PlayerListener.class);
 		addComponent(InventoryRepository.class);
 		addComponent(DebugCommand.class);
+        getComponent(IOutput.class).setDebugLevel(Level.FINER);
 	}
 
 	@Override
