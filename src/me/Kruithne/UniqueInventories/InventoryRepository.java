@@ -72,7 +72,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 	{
 		try
 		{
-			this.output.outputToConsole(
+			this.output.outputDebugToConsole(
 				String.format(
 					"Saving player %s in world %s (%s)",
 					inventory.getPlayerName(),
