@@ -17,28 +17,11 @@ import org.bukkit.entity.Player;
 
 public class InventoryRepository implements IRepository<InventoryStorage, Player>
 {
-	public InventoryRepository(IDatabase database, IOutput output, IConfiguration config)
+	public InventoryRepository(IDatabase database, IOutput output, IUniverses universes)
 	{
 		this.database = database;
 		this.output = output;
-		
-		ConfigurationSection grouping = config.getSection("groupedInventories");
-		groupedInventories = new HashMap<String, String>();
-		if(grouping == null)
-			return;
-		
-		Set<String> universes = grouping.getKeys(true);
-		if(universes == null)
-			return;
-		
-		for(String universe : universes)
-		{
-			for(String world : grouping.getStringList(universe))
-			{
-				groupedInventories.put(world, universe);
-				output.outputToConsole(String.format("Adding world %s to universe %s.", world, universe), Level.INFO);
-			}
-		}
+		this.universes = universes;
 	}
 	
 	@Override
@@ -46,7 +29,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 	{
 		PreparedStatement select = null;
 		String playerName = key.getName();
-		String inventoryName = getInventoryName(key.getWorld().getName());
+		String inventoryName = universes.getInventoryName(key.getWorld().getName());
 		try
 		{
 			select = this.database.prepare("SELECT * FROM uniqueInventories WHERE playerName=? AND inventoryName=?");
@@ -62,6 +45,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 				inv.setInventory(set.getString("inventory"));
 				inv.setLevel(set.getInt("level"));
 				inv.setExperience(set.getFloat("experience"));
+				inv.setSaved(set.getBoolean("saved"));
 			}
 			else
 			{
@@ -78,7 +62,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 		}
 		catch (SQLException e) 
 		{
-			this.output.outputToConsole(e.getMessage() + e.getStackTrace(), Level.SEVERE);
+			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
 		}
 		return null;
 	}
@@ -88,41 +72,35 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 	{
 		try
 		{
-			//this.output.outputToConsole(
-			//	String.format(
-			//		"Saving player %s in world %s (%s)", 
-				//	inventory.getPlayerName(), 
-				//	inventory.getWorldName(), 
-				//	inventory.getInventory()
-				//),
-				//Level.FINE
-			//);
+			this.output.outputToConsole(
+				String.format(
+					"Saving player %s in world %s (%s)",
+					inventory.getPlayerName(),
+					inventory.getWorldName(),
+					inventory.getInventory()
+				),
+				Level.FINE
+			);
 			PreparedStatement update = this.database.prepare(
-				"UPDATE uniqueInventories SET armor=?, inventory=?, level=?, experience=? WHERE playerName=? AND inventoryName=?"
+				"UPDATE uniqueInventories SET armor=?, inventory=?, level=?, experience=?, saved=? WHERE playerName=? AND inventoryName=?"
 			);
 			update.setString(1, inventory.getArmor());
 			update.setString(2, inventory.getInventory());
 			update.setLong(3, inventory.getLevel());
 			update.setFloat(4, inventory.getExperience());
-			update.setString(5, inventory.getPlayerName());
-			update.setString(6, getInventoryName(inventory.getWorldName()));
+			update.setBoolean(5, inventory.getSaved());
+			update.setString(6, inventory.getPlayerName());
+			update.setString(7, universes.getInventoryName(inventory.getWorldName()));
 			update.execute();
 		}
 		catch(SQLException e)
 		{
-			this.output.outputToConsole(e.getMessage() + e.getStackTrace(), Level.SEVERE);
+			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
 		}
 	}
-	
-	private String getInventoryName(String world)
-	{
-		if(groupedInventories.containsKey(world))
-			return groupedInventories.get(world);
-		
-		return world;
-	}
+
 	
 	private IDatabase database;
 	private IOutput output;
-	private HashMap<String, String> groupedInventories;
+	private IUniverses universes;
 }
