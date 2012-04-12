@@ -2,9 +2,9 @@ package me.Kruithne.UniqueInventories;
 
 import java.util.ArrayList;
 
-import no.runsafe.framework.interfaces.IPluginDisabled;
-import no.runsafe.framework.interfaces.IScheduler;
+import no.runsafe.framework.event.subscriber.IPluginDisabled;
 
+import no.runsafe.framework.timer.IScheduler;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -15,7 +15,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class PlayerListener implements Listener, IPluginDisabled {
+public class PlayerListener implements Listener, IPluginDisabled
+{
 	
 	private InventoryHandler inventoryHandler = null;
 	private Server server = null;

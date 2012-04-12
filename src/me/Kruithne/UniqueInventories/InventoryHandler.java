@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import no.runsafe.framework.interfaces.IRepository;
+import no.runsafe.framework.database.IRepository;
 
 import org.bukkit.Server;
 import org.bukkit.World;

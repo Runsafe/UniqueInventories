@@ -7,15 +7,15 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 
-import no.runsafe.framework.interfaces.IConfiguration;
-import no.runsafe.framework.interfaces.IDatabase;
-import no.runsafe.framework.interfaces.IOutput;
-import no.runsafe.framework.interfaces.IRepository;
+import no.runsafe.framework.configuration.IConfiguration;
+import no.runsafe.framework.database.IDatabase;
+import no.runsafe.framework.database.IRepository;
 
+import no.runsafe.framework.output.IOutput;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-public class InventoryRepository implements IRepository<InventoryStorage, Player> 
+public class InventoryRepository implements IRepository<InventoryStorage, Player>
 {
 	public InventoryRepository(IDatabase database, IOutput output, IConfiguration config)
 	{
