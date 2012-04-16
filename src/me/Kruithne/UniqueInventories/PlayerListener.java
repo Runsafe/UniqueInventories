@@ -54,7 +54,7 @@ public class PlayerListener implements Listener
 	private void updateInventory(final Player player)
 	{
 		this.limitedPlayers.add(player.getName());
-		this.scheduler.setTimedEvent(
+		this.scheduler.startSyncTask(
 			new Runnable()
 			{
 				public void run()
