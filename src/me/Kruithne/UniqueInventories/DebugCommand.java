@@ -6,8 +6,8 @@ import java.util.logging.Level;
 import no.runsafe.framework.command.RunsafeCommandHandler;
 
 import no.runsafe.framework.output.IOutput;
+import no.runsafe.framework.server.player.RunsafePlayer;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
 public class DebugCommand extends RunsafeCommandHandler 
 {
@@ -28,7 +28,7 @@ public class DebugCommand extends RunsafeCommandHandler
 		return "uniqueinv";
 	}
 
-	protected boolean playerExecute(Player player, List<String> args)
+	protected boolean playerExecute(RunsafePlayer player, List<String> args)
 	{
 		if(args.get(0).equalsIgnoreCase("debug"))
 		{
