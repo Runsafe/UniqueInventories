@@ -1,8 +1,8 @@
-package me.Kruithne.UniqueInventories;
+package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.configuration.IConfiguration;
 import no.runsafe.framework.output.IOutput;
-import org.bukkit.World;
+import no.runsafe.framework.server.RunsafeWorld;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class InventoryUniverses implements IUniverses
 	}
 
 	@Override
-	public boolean isDifferentUniverse(World world, World from)
+	public boolean isDifferentUniverse(RunsafeWorld world, RunsafeWorld from)
 	{
 		return !getInventoryName(world.getName()).equals(getInventoryName(from.getName()));
 	}

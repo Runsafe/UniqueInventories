@@ -1,6 +1,6 @@
-package me.Kruithne.UniqueInventories;
+package no.runsafe.UniqueInventories;
 
-import org.bukkit.World;
+import no.runsafe.framework.server.RunsafeWorld;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,5 +13,5 @@ public interface IUniverses
 {
 	String getInventoryName(String world);
 
-	boolean isDifferentUniverse(World world, World from);
+	boolean isDifferentUniverse(RunsafeWorld world, RunsafeWorld from);
 }

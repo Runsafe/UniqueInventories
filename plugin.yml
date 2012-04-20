@@ -1,11 +1,23 @@
 name: UniqueInventories
-main: me.Kruithne.UniqueInventories.UniqueInventories
-version: 1.0
-author: Kruithne
-description: Allows multiple inventories accross worlds.
+main: no.runsafe.UniqueInventories.UniqueInventories
+version: 1.2
+authors: [Kruithne, mortenn]
+description: Allows multiple inventories across worlds.
 commands:
   uniqueinv:
     description: Unique Inventories commands
-    usage: /uniqueinv debug <level>
-    permission: uniqueinventories.debug
-    aliases: [uid]
+    usage: /uniqueinv (debug <level>|push|pop|list)
+    aliases: [uinv]
+
+permissions:
+  uniqueinventories.*:
+    description: Gives access to all UniqueInventories commands
+    children:
+      uniqueinventories.stack: true
+      uniqueinventories.debug: true
+  uniqueinventories.stack:
+    description: Allows players to store and restore their inventory in a stack per world.
+    default: false
+  uniqueinventories.debug:
+    description: Allows the control of debug output.
+    default: false

@@ -1,11 +1,10 @@
-package me.Kruithne.UniqueInventories;
+package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.database.IRepository;
-import org.bukkit.Server;
-import org.bukkit.World;
+import no.runsafe.framework.server.RunsafeWorld;
+import no.runsafe.framework.server.player.RunsafePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -15,52 +14,45 @@ import java.util.*;
 public class InventoryHandler
 {
 
-	private IRepository<InventoryStorage, Player> repository = null;
+	private IRepository<InventoryStorage, RunsafePlayer> repository = null;
 
-	public InventoryHandler(IRepository<InventoryStorage, Player> repository)
+	public InventoryHandler(IRepository<InventoryStorage, RunsafePlayer> repository)
 	{
 		this.repository = repository;
 	}
 
-	public void saveInventory(Player player, World theWorld)
+	public void saveInventory(RunsafePlayer player, RunsafeWorld theWorld)
 	{
-		InventoryStorage storage = new InventoryStorage();
+		InventoryStorage storage;
+		if(repository instanceof InventoryRepository)
+			storage = ((InventoryRepository)repository).get(player, theWorld.getName());
+		else
+			storage = new InventoryStorage();
 		storage.setPlayerName(player.getName());
 		storage.setWorldName(theWorld.getName());
 		storage.setInventory(this.flatPackInventory(player));
-		storage.setExperience(player.getExp());
+		storage.setExperience(player.getXP());
 		storage.setLevel(player.getLevel());
 		storage.setArmor(this.flatPackArmor(player));
 		storage.setSaved(true);
 		this.repository.persist(storage);
 	}
 
-	public void saveAllInventories(Server server)
-	{
-		List<World> worlds = server.getWorlds();
-		Iterator<World> worldIterator = worlds.iterator();
+//	public void saveAllInventories(Server server)
+//	{
+//		List<World> worlds = server.getWorlds();
+//
+//		for (World world : worlds)
+//			for (Player player : world.getPlayers())
+//				this.saveInventory(player, world);
+//	}
 
-		while (worldIterator.hasNext())
-		{
-			World world = worldIterator.next();
-			List<Player> players = world.getPlayers();
-			Iterator<Player> playerIterator = players.iterator();
-
-			while (playerIterator.hasNext())
-			{
-				Player player = playerIterator.next();
-				this.saveInventory(player, world);
-			}
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	public void resetPlayersInventory(Player player)
+	public void resetPlayersInventory(RunsafePlayer player)
 	{
 		if (player == null || player.getInventory() == null)
 			return;
 
-		player.setExp(0.0F);
+		player.setXP(0.0F);
 		player.setLevel(0);
 		ItemStack[] armorReset = {
 			new ItemStack(0),
@@ -68,12 +60,12 @@ public class InventoryHandler
 			new ItemStack(0),
 			new ItemStack(0)
 		};
-		player.getInventory().setArmorContents(armorReset);
-		player.getInventory().clear();
+		player.getRaw().getInventory().setArmorContents(armorReset);
+		player.getRaw().getInventory().clear();
 		player.updateInventory();
 	}
 
-	public void loadInventory(Player player, World theWorld)
+	public void loadInventory(RunsafePlayer player)
 	{
 		InventoryStorage stored = this.repository.get(player);
 
@@ -82,13 +74,30 @@ public class InventoryHandler
 
 		if (stored != null)
 		{
-			player.setExp(stored.getExperience());
+			player.setXP(stored.getExperience());
 			player.setLevel(stored.getLevel());
 			this.unPackToInventory(stored.getInventory(), stored.getArmor(), player);
 			stored.setSaved(false);
 			this.repository.persist(stored);
 		}
+	}
 
+	public void PushInventory(RunsafePlayer player)
+	{
+		if (repository instanceof InventoryRepository)
+		{
+			saveInventory(player, player.getWorld());
+			InventoryStorage inventory = ((InventoryRepository) repository).addStack(player);
+			loadInventory(player);
+		}
+	}
+
+	public void PopInventory(RunsafePlayer player)
+	{
+		InventoryStorage inventory = repository.get(player);
+		if(inventory.getStack() > 0)
+			repository.delete(inventory);
+		loadInventory(player);
 	}
 
 	private String flattenEnchants(Map<Enchantment, Integer> enchants)
@@ -98,17 +107,15 @@ public class InventoryHandler
 			ArrayList<String> enchantStrings = new ArrayList<String>();
 			Set<Enchantment> enchantKeys = enchants.keySet();
 
-			Iterator<Enchantment> keysIterator = enchantKeys.iterator();
-
-			while (keysIterator.hasNext())
+			for (Enchantment theEnchant : enchantKeys)
 			{
-				Enchantment theEnchant = (Enchantment) keysIterator.next();
-				int enchantData = (Integer) enchants.get(theEnchant);
+				int enchantData = enchants.get(theEnchant);
 				enchantStrings.add(String.format("%s#%s", theEnchant.getId(), enchantData));
 			}
 
 			return Join(enchantStrings, "@");
-		} else
+		}
+		else
 		{
 			return "0";
 		}
@@ -118,20 +125,19 @@ public class InventoryHandler
 	{
 		Map<Enchantment, Integer> returnEnchants = new HashMap<Enchantment, Integer>();
 		String enchantSplit[] = enchantString.split("@");
-		for (int i = 0; i < enchantSplit.length; i++)
+		for (String anEnchantSplit : enchantSplit)
 		{
-			String enchantData[] = enchantSplit[i].split("#");
+			String enchantData[] = anEnchantSplit.split("#");
 			Enchantment enchant = new EnchantmentWrapper(Integer.parseInt(enchantData[0]));
-			returnEnchants.put(enchant, Integer.valueOf(Integer.parseInt(enchantData[1])));
+			returnEnchants.put(enchant, Integer.parseInt(enchantData[1]));
 		}
 
 		return returnEnchants;
 	}
 
-	@SuppressWarnings("deprecation")
-	private void unPackToInventory(String packedInventory, String packedArmor, Player player)
+	private void unPackToInventory(String packedInventory, String packedArmor, RunsafePlayer player)
 	{
-		Inventory playerInventory = player.getInventory();
+		Inventory playerInventory = player.getRaw().getInventory();
 		playerInventory.clear();
 		//index, ID, amount, dura, data, helmet, chestplate, leggings, boots
 		HashMap<Integer, ItemStack> itemStacks = new HashMap<Integer, ItemStack>();
@@ -140,12 +146,12 @@ public class InventoryHandler
 		{
 			String[] items = packedInventory.split(",");
 
-			for (int i = 0; i < items.length; i++)
+			for (String item : items)
 			{
 				//0&61:22:0:0:0
-				if (!items[i].isEmpty())
+				if (!item.isEmpty())
 				{
-					String[] itemObject = items[i].split("&");
+					String[] itemObject = item.split("&");
 					itemStacks.put(Integer.parseInt(itemObject[0]), this.unpackItem(itemObject[1]));
 				}
 			}
@@ -200,9 +206,9 @@ public class InventoryHandler
 		return String.format("%s:%s:%s:%s:%s", itemID, itemAmount, durability, data, enchants);
 	}
 
-	private String flatPackArmor(Player player)
+	private String flatPackArmor(RunsafePlayer player)
 	{
-		ItemStack[] armor = player.getInventory().getArmorContents();
+		ItemStack[] armor = player.getRaw().getInventory().getArmorContents();
 		ArrayList<String> prePackedArmor = new ArrayList<String>();
 
 		for (int i = 0; i < armor.length; i++)
@@ -213,27 +219,27 @@ public class InventoryHandler
 		return Join(prePackedArmor, ",");
 	}
 
-	private void unpackArmorToPlayer(String armorImport, Player player)
+	private void unpackArmorToPlayer(String armorImport, RunsafePlayer player)
 	{
 		if (armorImport != null && !armorImport.isEmpty())
 		{
 			String[] armorItems = armorImport.split(",");
 			ItemStack[] armorPack = new ItemStack[4];
 
-			for (int i = 0; i < armorItems.length; i++)
+			for (String armorItem : armorItems)
 			{
-				String[] armorObject = armorItems[i].split("&");
+				String[] armorObject = armorItem.split("&");
 
 				armorPack[Integer.parseInt(armorObject[0])] = this.unpackItem(armorObject[1]);
 			}
 
-			player.getInventory().setArmorContents(armorPack);
+			player.getRaw().getInventory().setArmorContents(armorPack);
 		}
 	}
 
-	private String flatPackInventory(Player player)
+	private String flatPackInventory(RunsafePlayer player)
 	{
-		Inventory playerInventory = player.getInventory();
+		Inventory playerInventory = player.getRaw().getInventory();
 
 		ArrayList<String> itemData = new ArrayList<String>();
 		Iterator<ItemStack> itemStackIterator = playerInventory.iterator();
@@ -261,12 +267,10 @@ public class InventoryHandler
 		StringBuilder sb = new StringBuilder();
 
 		for (String x : coll)
-			sb.append(x + delimiter);
+			sb.append(x).append(delimiter);
 
 		sb.delete(sb.length() - delimiter.length(), sb.length());
 
 		return sb.toString();
 	}
-
-
 }

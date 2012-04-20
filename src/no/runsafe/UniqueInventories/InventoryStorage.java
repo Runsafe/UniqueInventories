@@ -1,4 +1,4 @@
-package me.Kruithne.UniqueInventories;
+package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.database.RunsafeEntity;
 
@@ -74,6 +74,16 @@ public class InventoryStorage extends RunsafeEntity
 		this.saved = saved;
 	}
 
+	public int getStack()
+	{
+		return stack;
+	}
+
+	public void setStack(int stack)
+	{
+		this.stack = stack;
+	}
+
 	private String playerName;
 	private String worldName;
 	private String inventory;
@@ -81,4 +91,5 @@ public class InventoryStorage extends RunsafeEntity
 	private int level;
 	private String armor;
 	private boolean saved;
+	private int stack;
 }

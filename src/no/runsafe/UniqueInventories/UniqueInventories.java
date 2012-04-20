@@ -1,10 +1,13 @@
-package me.Kruithne.UniqueInventories;
+package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.RunsafePlugin;
+import no.runsafe.framework.command.ICommand;
+import no.runsafe.framework.command.RunsafeCommand;
 import no.runsafe.framework.configuration.IConfigurationDefaults;
 import no.runsafe.framework.configuration.IConfigurationFile;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class UniqueInventories extends RunsafePlugin implements IConfigurationFile, IConfigurationDefaults
 {
@@ -16,8 +19,18 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 		addComponent(InventoryHandler.class);
 		addComponent(PlayerListener.class);
 		addComponent(InventoryRepository.class);
-		addComponent(DebugCommand.class);
 		addComponent(InventoryUniverses.class);
+
+		ArrayList<ICommand> subCommands = new ArrayList<ICommand>()
+		{{
+			add(getInstance(ListCommand.class));
+			add(getInstance(PushCommand.class));
+			add(getInstance(PopCommand.class));
+			add(new DebugCommand());
+		}};
+
+		RunsafeCommand command = new RunsafeCommand("uniqueinv", subCommands);
+		addComponent(command);
 	}
 
 	@Override
