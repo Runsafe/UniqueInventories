@@ -12,6 +12,12 @@ public class PushCommand extends RunsafeCommand
 	}
 
 	@Override
+	public String requiredPermission()
+	{
+		return "uniqueinventories.stack";
+	}
+
+	@Override
 	public boolean Execute(RunsafePlayer player, String[] args)
 	{
 		inventoryHandler.PushInventory(player);

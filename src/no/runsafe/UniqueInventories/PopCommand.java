@@ -12,6 +12,12 @@ public class PopCommand extends RunsafeCommand
 	}
 
 	@Override
+	public String requiredPermission()
+	{
+		return "uniqueinventories.stack";
+	}
+
+	@Override
 	public boolean Execute(RunsafePlayer player, String[] args)
 	{
 		handler.PopInventory(player);

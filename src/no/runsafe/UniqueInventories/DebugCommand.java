@@ -14,6 +14,12 @@ public class DebugCommand extends RunsafeCommand
 	}
 
 	@Override
+	public String requiredPermission()
+	{
+		return "uniqueinventories.debug";
+	}
+
+	@Override
 	public boolean Execute(RunsafePlayer player, String[] args)
 	{
 		return Execute(args);

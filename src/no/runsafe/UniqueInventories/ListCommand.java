@@ -13,6 +13,12 @@ public class ListCommand extends RunsafeCommand
 	}
 
 	@Override
+	public String requiredPermission()
+	{
+		return "uniqueinventories.stack";
+	}
+
+	@Override
 	public boolean Execute(RunsafePlayer player, String[] args)
 	{
 		player.sendMessage(String.format("%s inventories stored", repository.get(player).getStack() + 1));
