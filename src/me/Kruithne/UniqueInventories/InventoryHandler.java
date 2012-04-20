@@ -73,8 +73,13 @@ public class InventoryHandler
 		player.updateInventory();
 	}
 
+    @SuppressWarnings("deprecation")
 	public void loadInventory(Player player, World theWorld)
 	{
+        // Getting rid of this means new players can tranfer items from Creative -> Survival and so on
+        player.getInventory().clear();
+        player.updateInventory();
+
 		InventoryStorage stored = this.repository.get(player);
 
 		if (stored != null && !stored.getSaved())
@@ -88,6 +93,7 @@ public class InventoryHandler
 			stored.setSaved(false);
 			this.repository.persist(stored);
 		}
+
 	}
 
 	private String flattenEnchants(Map<Enchantment, Integer> enchants)

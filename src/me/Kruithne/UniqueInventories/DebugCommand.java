@@ -3,6 +3,7 @@ package me.Kruithne.UniqueInventories;
 import java.util.List;
 import java.util.logging.Level;
 
+import no.runsafe.framework.command.ICommand;
 import no.runsafe.framework.command.RunsafeCommandHandler;
 
 import no.runsafe.framework.output.IOutput;
@@ -11,16 +12,10 @@ import org.bukkit.command.ConsoleCommandSender;
 
 public class DebugCommand extends RunsafeCommandHandler 
 {
-	public DebugCommand(IOutput output)
-	{
-		this.output = output;
-	}
-	
-	@Override
-	protected boolean getConsoleAccessible() 
-	{
-		return true;
-	}
+    public DebugCommand(ICommand command)
+    {
+        super(command);
+    }
 
 	@Override
 	public String getName() 
