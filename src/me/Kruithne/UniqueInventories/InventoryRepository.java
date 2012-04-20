@@ -1,19 +1,14 @@
 package me.Kruithne.UniqueInventories;
 
+import no.runsafe.framework.database.IDatabase;
+import no.runsafe.framework.database.IRepository;
+import no.runsafe.framework.output.IOutput;
+import org.bukkit.entity.Player;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Set;
 import java.util.logging.Level;
-
-import no.runsafe.framework.configuration.IConfiguration;
-import no.runsafe.framework.database.IDatabase;
-import no.runsafe.framework.database.IRepository;
-
-import no.runsafe.framework.output.IOutput;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 public class InventoryRepository implements IRepository<InventoryStorage, Player>
 {
@@ -23,7 +18,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 		this.output = output;
 		this.universes = universes;
 	}
-	
+
 	@Override
 	public InventoryStorage get(Player key)
 	{
@@ -37,7 +32,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 			select.setString(2, inventoryName);
 			ResultSet set = select.executeQuery();
 			InventoryStorage inv = new InventoryStorage();
-			if(set.first())
+			if (set.first())
 			{
 				inv.setPlayerName(set.getString("playerName"));
 				inv.setWorldName(set.getString("inventoryName"));
@@ -46,12 +41,12 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 				inv.setLevel(set.getInt("level"));
 				inv.setExperience(set.getFloat("experience"));
 				inv.setSaved(set.getBoolean("saved"));
-			}
-			else
+			} else
 			{
 				PreparedStatement insert = this.database.prepare("INSERT INTO uniqueInventories (playerName, inventoryName) VALUES (?, ?)");
 				inv.setPlayerName(playerName);
 				inv.setWorldName(inventoryName);
+				inv.setSaved(true);
 				insert.setString(1, playerName);
 				insert.setString(2, inventoryName);
 				insert.executeUpdate();
@@ -59,8 +54,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 			}
 			select.close();
 			return inv;
-		}
-		catch (SQLException e) 
+		} catch (SQLException e)
 		{
 			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
 		}
@@ -68,7 +62,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 	}
 
 	@Override
-	public void persist(InventoryStorage inventory) 
+	public void persist(InventoryStorage inventory)
 	{
 		try
 		{
@@ -92,14 +86,13 @@ public class InventoryRepository implements IRepository<InventoryStorage, Player
 			update.setString(6, inventory.getPlayerName());
 			update.setString(7, universes.getInventoryName(inventory.getWorldName()));
 			update.execute();
-		}
-		catch(SQLException e)
+		} catch (SQLException e)
 		{
 			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
 		}
 	}
 
-	
+
 	private IDatabase database;
 	private IOutput output;
 	private IUniverses universes;
