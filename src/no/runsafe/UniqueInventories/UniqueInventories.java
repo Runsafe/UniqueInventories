@@ -26,7 +26,7 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 			add(getInstance(ListCommand.class));
 			add(getInstance(PushCommand.class));
 			add(getInstance(PopCommand.class));
-			add(new DebugCommand());
+			add(getInstance(DebugCommand.class));
 		}};
 
 		RunsafeCommand command = new RunsafeCommand("uniqueinv", subCommands);

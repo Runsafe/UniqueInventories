@@ -8,9 +8,10 @@ import java.util.logging.Level;
 
 public class DebugCommand extends RunsafeCommand
 {
-	public DebugCommand()
+	public DebugCommand(IOutput output)
 	{
 		super("debug", null);
+		this.output = output;
 	}
 
 	@Override
