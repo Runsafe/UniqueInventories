@@ -120,7 +120,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 		try
 		{
 			InventoryStorage inv = get(key);
-			return createInventory(key.getName(), key.getWorld().getName(), inv.getStack() + 1);
+			return createInventory(key.getName(), universes.getInventoryName(key.getWorld().getName()), inv.getStack() + 1);
 		}
 		catch (SQLException e)
 		{
