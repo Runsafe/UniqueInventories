@@ -87,7 +87,7 @@ public class InventoryHandler
 		if (repository instanceof InventoryRepository)
 		{
 			saveInventory(player, player.getWorld());
-			InventoryStorage inventory = ((InventoryRepository) repository).addStack(player);
+			((InventoryRepository) repository).addStack(player);
 			loadInventory(player);
 		}
 	}
