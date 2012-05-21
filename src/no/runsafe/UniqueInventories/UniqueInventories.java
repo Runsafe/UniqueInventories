@@ -1,5 +1,6 @@
 package no.runsafe.UniqueInventories;
 
+import no.runsafe.UniqueInventories.Command.*;
 import no.runsafe.framework.RunsafePlugin;
 import no.runsafe.framework.command.ICommand;
 import no.runsafe.framework.command.RunsafeCommand;
@@ -26,6 +27,8 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 			add(getInstance(PushCommand.class));
 			add(getInstance(PopCommand.class));
 			add(getInstance(DebugCommand.class));
+			add(getInstance(TemplateCommand.class));
+			add(getInstance(WorldwipeCommand.class));
 		}};
 
 		RunsafeCommand command = new RunsafeCommand("uniqueinv", subCommands);

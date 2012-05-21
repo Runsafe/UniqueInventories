@@ -1,5 +1,6 @@
-package no.runsafe.UniqueInventories;
+package no.runsafe.UniqueInventories.Command;
 
+import no.runsafe.UniqueInventories.InventoryRepository;
 import no.runsafe.framework.command.RunsafeCommand;
 import no.runsafe.framework.output.IOutput;
 import no.runsafe.framework.server.player.RunsafePlayer;

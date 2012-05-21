@@ -1,4 +1,4 @@
-package no.runsafe.UniqueInventories;
+package no.runsafe.UniqueInventories.Command;
 
 import no.runsafe.framework.command.RunsafeCommand;
 import no.runsafe.framework.output.IOutput;

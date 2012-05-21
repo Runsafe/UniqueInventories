@@ -147,4 +147,20 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 	private IDatabase database;
 	private IOutput output;
 	private IUniverses universes;
+
+	public void Wipe(String world)
+	{
+		try
+		{
+			PreparedStatement delete = this.database.prepare(
+				"DELETE FROM uniqueInventories WHERE inventoryName=?"
+			);
+			delete.setString(1, universes.getInventoryName(world));
+			delete.execute();
+		}
+		catch (SQLException e)
+		{
+			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
+		}
+	}
 }

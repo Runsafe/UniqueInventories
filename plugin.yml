@@ -21,3 +21,9 @@ permissions:
   uniqueinventories.debug:
     description: Allows the control of debug output.
     default: false
+  uniqueinventories.template:
+    description: Allows editing the template inventory for a world.
+    default: false
+  uniqueinventories.worldwipe:
+    description: Allows the use of the world-wipe command, erasing all inventories.
+    default: false
