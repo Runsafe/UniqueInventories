@@ -6,7 +6,7 @@ description: Allows multiple inventories across worlds.
 commands:
   uniqueinv:
     description: Unique Inventories commands
-    usage: /uniqueinv (debug <level>|push|pop|list)
+    usage: /uniqueinv (debug <level>|push|pop|list|template load|template save|worldwipe <world>)
     aliases: [uinv]
 
 permissions:
