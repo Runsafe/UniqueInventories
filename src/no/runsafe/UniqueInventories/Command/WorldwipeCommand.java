@@ -3,6 +3,7 @@ package no.runsafe.UniqueInventories.Command;
 import no.runsafe.UniqueInventories.InventoryHandler;
 import no.runsafe.UniqueInventories.InventoryRepository;
 import no.runsafe.framework.command.RunsafeCommand;
+import no.runsafe.framework.server.RunsafeWorld;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
 public class WorldwipeCommand extends RunsafeCommand
@@ -28,7 +29,7 @@ public class WorldwipeCommand extends RunsafeCommand
 
 		inventories.Wipe(args[0]);
 
-		for (RunsafePlayer inWorld : player.getWorld().getPlayers())
+		for (RunsafePlayer inWorld : new RunsafeWorld(args[0]).getPlayers())
 			handler.loadTemplateInventory(inWorld);
 
 		return true;
