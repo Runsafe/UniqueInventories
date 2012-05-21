@@ -5,6 +5,7 @@ import no.runsafe.framework.server.RunsafeWorld;
 import no.runsafe.framework.server.player.RunsafePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -60,8 +61,9 @@ public class InventoryHandler
 			new ItemStack(0),
 			new ItemStack(0)
 		};
-		player.getRaw().getInventory().setArmorContents(armorReset);
-		player.getRaw().getInventory().clear();
+
+		player.getInventory().setArmorContents(armorReset);
+        player.getInventory().clear();
 		player.updateInventory();
 	}
 
@@ -137,7 +139,7 @@ public class InventoryHandler
 
 	private void unPackToInventory(String packedInventory, String packedArmor, RunsafePlayer player)
 	{
-		Inventory playerInventory = player.getRaw().getInventory();
+		Inventory playerInventory = player.getInventory();
 		playerInventory.clear();
 		//index, ID, amount, dura, data, helmet, chestplate, leggings, boots
 		HashMap<Integer, ItemStack> itemStacks = new HashMap<Integer, ItemStack>();
@@ -208,7 +210,7 @@ public class InventoryHandler
 
 	private String flatPackArmor(RunsafePlayer player)
 	{
-		ItemStack[] armor = player.getRaw().getInventory().getArmorContents();
+		ItemStack[] armor = player.getInventory().getArmorContents();
 		ArrayList<String> prePackedArmor = new ArrayList<String>();
 
 		for (int i = 0; i < armor.length; i++)
@@ -233,13 +235,13 @@ public class InventoryHandler
 				armorPack[Integer.parseInt(armorObject[0])] = this.unpackItem(armorObject[1]);
 			}
 
-			player.getRaw().getInventory().setArmorContents(armorPack);
+			player.getInventory().setArmorContents(armorPack);
 		}
 	}
 
 	private String flatPackInventory(RunsafePlayer player)
 	{
-		Inventory playerInventory = player.getRaw().getInventory();
+		Inventory playerInventory = player.getInventory();
 
 		ArrayList<String> itemData = new ArrayList<String>();
 		Iterator<ItemStack> itemStackIterator = playerInventory.iterator();
