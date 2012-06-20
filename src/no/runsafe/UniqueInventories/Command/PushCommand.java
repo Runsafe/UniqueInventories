@@ -2,9 +2,10 @@ package no.runsafe.UniqueInventories.Command;
 
 import no.runsafe.UniqueInventories.InventoryHandler;
 import no.runsafe.framework.command.RunsafeCommand;
+import no.runsafe.framework.command.RunsafePlayerCommand;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
-public class PushCommand extends RunsafeCommand
+public class PushCommand extends RunsafePlayerCommand
 {
 	public PushCommand(InventoryHandler handler)
 	{
@@ -19,11 +20,10 @@ public class PushCommand extends RunsafeCommand
 	}
 
 	@Override
-	public boolean Execute(RunsafePlayer player, String[] args)
+	public String OnExecute(RunsafePlayer executor, String[] args)
 	{
-		inventoryHandler.PushInventory(player);
-		player.sendMessage("Inventory stored");
-		return true;
+		inventoryHandler.PushInventory(executor);
+		return  "Inventory stored";
 	}
 
 	private InventoryHandler inventoryHandler;

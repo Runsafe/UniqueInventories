@@ -43,15 +43,6 @@ public class InventoryHandler
 		this.repository.persist(storage);
 	}
 
-//	public void saveAllInventories(Server server)
-//	{
-//		List<World> worlds = server.getWorlds();
-//
-//		for (World world : worlds)
-//			for (Player player : world.getPlayers())
-//				this.saveInventory(player, world);
-//	}
-
 	public void resetPlayersInventory(RunsafePlayer player)
 	{
 		if (player == null || player.getInventory() == null)
@@ -255,20 +246,17 @@ public class InventoryHandler
 
 	private void unpackArmorToPlayer(String armorImport, RunsafePlayer player)
 	{
-		if (armorImport != null && !armorImport.isEmpty())
+		if(armorImport == null || armorImport.isEmpty())
+			armorImport = "0&0:0:-1:0:0,1&0:0:-1:0:0,2&0:0:-1:0:0,3&0:0:-1:0:0";
+
+		ItemStack[] armorPack = new ItemStack[4];
+		String[] armorItems = armorImport.split(",");
+		for (String armorItem : armorItems)
 		{
-			String[] armorItems = armorImport.split(",");
-			ItemStack[] armorPack = new ItemStack[4];
-
-			for (String armorItem : armorItems)
-			{
-				String[] armorObject = armorItem.split("&");
-
-				armorPack[Integer.parseInt(armorObject[0])] = this.unpackItem(armorObject[1]);
-			}
-
-			player.getRawPlayer().getInventory().setArmorContents(armorPack);
+			String[] armorObject = armorItem.split("&");
+			armorPack[Integer.parseInt(armorObject[0])] = this.unpackItem(armorObject[1]);
 		}
+		player.getRawPlayer().getInventory().setArmorContents(armorPack);
 	}
 
 	private String flatPackInventory(RunsafePlayer player)

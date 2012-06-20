@@ -2,9 +2,10 @@ package no.runsafe.UniqueInventories.Command;
 
 import no.runsafe.UniqueInventories.InventoryHandler;
 import no.runsafe.framework.command.RunsafeCommand;
+import no.runsafe.framework.command.RunsafePlayerCommand;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
-public class PopCommand extends RunsafeCommand
+public class PopCommand extends RunsafePlayerCommand
 {
 	public PopCommand(InventoryHandler inventoryHandler)
 	{
@@ -19,11 +20,10 @@ public class PopCommand extends RunsafeCommand
 	}
 
 	@Override
-	public boolean Execute(RunsafePlayer player, String[] args)
+	public String OnExecute(RunsafePlayer executor, String[] args)
 	{
-		handler.PopInventory(player);
-		player.sendMessage("Inventory restored");
-		return true;
+		handler.PopInventory(executor);
+		return "Inventory restored";
 	}
 
 	private InventoryHandler handler;

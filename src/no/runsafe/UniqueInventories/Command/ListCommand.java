@@ -2,10 +2,11 @@ package no.runsafe.UniqueInventories.Command;
 
 import no.runsafe.UniqueInventories.InventoryRepository;
 import no.runsafe.framework.command.RunsafeCommand;
+import no.runsafe.framework.command.RunsafePlayerCommand;
 import no.runsafe.framework.output.IOutput;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
-public class ListCommand extends RunsafeCommand
+public class ListCommand extends RunsafePlayerCommand
 {
 	public ListCommand(InventoryRepository repository)
 	{
@@ -20,10 +21,9 @@ public class ListCommand extends RunsafeCommand
 	}
 
 	@Override
-	public boolean Execute(RunsafePlayer player, String[] args)
+	public String OnExecute(RunsafePlayer executor, String[] args)
 	{
-		player.sendMessage(String.format("%s inventories stored", repository.get(player).getStack() + 1));
-		return true;
+		return String.format("%s inventories stored", repository.get(executor).getStack() + 1);
 	}
 
 	private InventoryRepository repository;
