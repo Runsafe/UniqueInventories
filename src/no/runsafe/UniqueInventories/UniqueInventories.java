@@ -4,12 +4,10 @@ import no.runsafe.UniqueInventories.Command.*;
 import no.runsafe.UniqueInventories.Command.Template.LoadCommand;
 import no.runsafe.UniqueInventories.Command.Template.SaveCommand;
 import no.runsafe.framework.RunsafePlugin;
-import no.runsafe.framework.command.ICommand;
 import no.runsafe.framework.command.RunsafeCommand;
 import no.runsafe.framework.configuration.IConfigurationFile;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 
 public class UniqueInventories extends RunsafePlugin implements IConfigurationFile
 {

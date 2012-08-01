@@ -50,14 +50,6 @@ public class InventoryHandler
 
 		player.setXP(0.0F);
 		player.setLevel(0);
-		ItemStack[] armorReset = {
-			new ItemStack(0),
-			new ItemStack(0),
-			new ItemStack(0),
-			new ItemStack(0)
-		};
-
-		player.getRawPlayer().getInventory().setArmorContents(armorReset);
 		player.getInventory().clear();
 		player.updateInventory();
 	}
