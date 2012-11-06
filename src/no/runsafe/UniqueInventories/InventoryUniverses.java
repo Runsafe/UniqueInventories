@@ -47,5 +47,5 @@ public class InventoryUniverses implements IUniverses
 		return !getInventoryName(world.getName()).equals(getInventoryName(from.getName()));
 	}
 
-	private HashMap<String, String> groupedInventories;
+	private final HashMap<String, String> groupedInventories;
 }

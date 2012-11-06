@@ -1,5 +1,5 @@
 name: UniqueInventories
-main: no.runsafe.UniqueInventories.UniqueInventories
+main: no.runsafe.UniqueInventories.Plugin
 version: 1.2
 authors: [Kruithne, mortenn]
 description: Allows multiple inventories across worlds.

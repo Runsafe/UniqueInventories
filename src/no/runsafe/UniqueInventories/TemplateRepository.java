@@ -22,11 +22,10 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 	@Override
 	public InventoryStorage get(String world)
 	{
-		PreparedStatement select = null;
 		String inventoryName = universes.getInventoryName(world);
 		try
 		{
-			select = this.database.prepare("SELECT * FROM uniqueInventoryTemplates WHERE inventoryName=?");
+			PreparedStatement select = this.database.prepare("SELECT * FROM uniqueInventoryTemplates WHERE inventoryName=?");
 			select.setString(1, inventoryName);
 			ResultSet set = select.executeQuery();
 			InventoryStorage inv = new InventoryStorage();
@@ -62,7 +61,7 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 		{
 			this.output.outputDebugToConsole(
 				String.format(
-					"Saving template inventory for world %s (%s)",
+					"Saving template inventory for world %s",
 					inventory.getWorldName()
 				),
 				Level.FINE
@@ -113,7 +112,7 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 		return inv;
 	}
 
-	private IDatabase database;
-	private IOutput output;
-	private IUniverses universes;
+	private final IDatabase database;
+	private final IOutput output;
+	private final IUniverses universes;
 }

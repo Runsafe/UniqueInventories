@@ -12,7 +12,7 @@ public class LoadCommand extends RunsafePlayerCommand
 {
 	public LoadCommand(InventoryHandler handler)
 	{
-		super("load", null);
+		super("load");
 		this.handler = handler;
 	}
 
@@ -30,5 +30,5 @@ public class LoadCommand extends RunsafePlayerCommand
 		return "Template for current world loaded - remember to save!";
 	}
 
-	private InventoryHandler handler;
+	private final InventoryHandler handler;
 }

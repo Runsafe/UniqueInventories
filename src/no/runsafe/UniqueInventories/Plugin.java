@@ -3,13 +3,14 @@ package no.runsafe.UniqueInventories;
 import no.runsafe.UniqueInventories.Command.*;
 import no.runsafe.UniqueInventories.Command.Template.LoadCommand;
 import no.runsafe.UniqueInventories.Command.Template.SaveCommand;
+import no.runsafe.framework.RunsafeConfigurablePlugin;
 import no.runsafe.framework.RunsafePlugin;
 import no.runsafe.framework.command.RunsafeCommand;
 import no.runsafe.framework.configuration.IConfigurationFile;
 
 import java.io.InputStream;
 
-public class UniqueInventories extends RunsafePlugin implements IConfigurationFile
+public class Plugin extends RunsafeConfigurablePlugin implements IConfigurationFile
 {
 	public PlayerListener playerListener = null;
 
@@ -33,17 +34,5 @@ public class UniqueInventories extends RunsafePlugin implements IConfigurationFi
 		command.addSubCommand(template);
 
 		addComponent(command);
-	}
-
-	@Override
-	public String getConfigurationPath()
-	{
-		return "plugins/" + this.getName() + "/config.yml";
-	}
-
-	@Override
-	public InputStream getDefaultConfiguration()
-	{
-		return getResource("defaults.yml");
 	}
 }

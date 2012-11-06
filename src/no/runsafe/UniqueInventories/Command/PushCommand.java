@@ -9,7 +9,7 @@ public class PushCommand extends RunsafePlayerCommand
 {
 	public PushCommand(InventoryHandler handler)
 	{
-		super("push", null);
+		super("push");
 		inventoryHandler = handler;
 	}
 
@@ -26,5 +26,5 @@ public class PushCommand extends RunsafePlayerCommand
 		return  "Inventory stored";
 	}
 
-	private InventoryHandler inventoryHandler;
+	private final InventoryHandler inventoryHandler;
 }

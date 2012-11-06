@@ -9,7 +9,7 @@ public class PopCommand extends RunsafePlayerCommand
 {
 	public PopCommand(InventoryHandler inventoryHandler)
 	{
-		super("pop", null);
+		super("pop");
 		handler = inventoryHandler;
 	}
 
@@ -26,5 +26,5 @@ public class PopCommand extends RunsafePlayerCommand
 		return "Inventory restored";
 	}
 
-	private InventoryHandler handler;
+	private final InventoryHandler handler;
 }

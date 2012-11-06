@@ -27,12 +27,11 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 
 	public InventoryStorage get(RunsafePlayer player, String world)
 	{
-		PreparedStatement select = null;
 		String playerName = player.getName();
 		String inventoryName = universes.getInventoryName(world);
 		try
 		{
-			select = this.database.prepare("SELECT * FROM uniqueInventories WHERE playerName=? AND inventoryName=? ORDER BY stack DESC");
+			PreparedStatement select = this.database.prepare("SELECT * FROM uniqueInventories WHERE playerName=? AND inventoryName=? ORDER BY stack DESC");
 			select.setString(1, playerName);
 			select.setString(2, inventoryName);
 			ResultSet set = select.executeQuery();
@@ -144,9 +143,9 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 		return inv;
 	}
 
-	private IDatabase database;
-	private IOutput output;
-	private IUniverses universes;
+	private final IDatabase database;
+	private final IOutput output;
+	private final IUniverses universes;
 
 	public void Wipe(String world)
 	{

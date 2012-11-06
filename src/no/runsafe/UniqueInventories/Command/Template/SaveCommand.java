@@ -12,7 +12,7 @@ public class SaveCommand extends RunsafePlayerCommand
 {
 	public SaveCommand(InventoryHandler handler)
 	{
-		super("save", null);
+		super("save");
 		this.handler = handler;
 	}
 
@@ -30,5 +30,5 @@ public class SaveCommand extends RunsafePlayerCommand
 		return "Template saved and inventory restored!";
 	}
 
-	private InventoryHandler handler;
+	private final InventoryHandler handler;
 }

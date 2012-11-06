@@ -10,7 +10,7 @@ public class ListCommand extends RunsafePlayerCommand
 {
 	public ListCommand(InventoryRepository repository)
 	{
-		super("list", null);
+		super("list");
 		this.repository = repository;
 	}
 
@@ -26,5 +26,5 @@ public class ListCommand extends RunsafePlayerCommand
 		return String.format("%s inventories stored", repository.get(executor).getStack() + 1);
 	}
 
-	private InventoryRepository repository;
+	private final InventoryRepository repository;
 }

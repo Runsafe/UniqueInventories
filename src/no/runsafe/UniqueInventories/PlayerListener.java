@@ -13,9 +13,9 @@ import java.util.ArrayList;
 public class PlayerListener implements IPlayerChangedWorldEvent, IPlayerDropItemEvent
 {
 	private InventoryHandler inventoryHandler = null;
-	private ArrayList<String> limitedPlayers = new ArrayList<String>();
-	private IScheduler scheduler;
-	private IUniverses universes;
+	private final ArrayList<String> limitedPlayers = new ArrayList<String>();
+	private final IScheduler scheduler;
+	private final IUniverses universes;
 
 	public PlayerListener(IScheduler scheduler, InventoryHandler inventoryHandler, IUniverses universes)
 	{

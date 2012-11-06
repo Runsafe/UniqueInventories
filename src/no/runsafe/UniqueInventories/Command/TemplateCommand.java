@@ -15,7 +15,7 @@ public class TemplateCommand extends RunsafePlayerCommand
 {
 	public TemplateCommand(InventoryHandler handler)
 	{
-		super("template", null);
+		super("template");
 		addSubCommand(new LoadCommand(handler));
 		addSubCommand(new SaveCommand(handler));
 	}

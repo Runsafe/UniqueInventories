@@ -12,7 +12,7 @@ public class WorldwipeCommand extends RunsafePlayerCommand
 {
 	public WorldwipeCommand(InventoryRepository inventories, InventoryHandler handler)
 	{
-		super("worldwipe", null, "world");
+		super("worldwipe", "world");
 		this.inventories = inventories;
 		this.handler = handler;
 	}
@@ -47,7 +47,7 @@ public class WorldwipeCommand extends RunsafePlayerCommand
 		return String.format("World %s inventories wiped.", world);
 	}
 
-	private InventoryRepository inventories;
-	private InventoryHandler handler;
+	private final InventoryRepository inventories;
+	private final InventoryHandler handler;
 	private String worldName;
 }
