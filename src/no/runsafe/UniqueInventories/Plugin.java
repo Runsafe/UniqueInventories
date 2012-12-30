@@ -21,12 +21,13 @@ public class Plugin extends RunsafeConfigurablePlugin implements IConfigurationF
 		addComponent(PlayerListener.class);
 		addComponent(InventoryRepository.class);
 		addComponent(InventoryUniverses.class);
+		addComponent(ClearInventory.class);
 
-		RunsafeCommand template = new RunsafeCommand("template", null);
+		RunsafeCommand template = new RunsafeCommand("template");
 		template.addSubCommand(getInstance(LoadCommand.class));
 		template.addSubCommand(getInstance(SaveCommand.class));
 
-		RunsafeCommand command = new RunsafeCommand("uniqueinv", null);
+		RunsafeCommand command = new RunsafeCommand("uniqueinv");
 		command.addSubCommand(getInstance(ListCommand.class));
 		command.addSubCommand(getInstance(PushCommand.class));
 		command.addSubCommand(getInstance(PopCommand.class));

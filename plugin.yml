@@ -8,6 +8,9 @@ commands:
     description: Unique Inventories commands
     usage: /uniqueinv (debug <level>|push|pop|list|template load|template save|worldwipe <world>)
     aliases: [uinv]
+  clearinventory:
+    description: Clears the players inventory
+    aliases: [ci]
 
 permissions:
   uniqueinventories.*:
