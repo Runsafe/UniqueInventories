@@ -13,22 +13,22 @@ public class InventoryStorage extends RunsafeEntity
 	{
 		this.playerName = playerName;
 	}
-	
+
 	public String getWorldName()
 	{
 		return worldName;
 	}
-	
+
 	public void setWorldName(String worldName)
 	{
 		this.worldName = worldName;
 	}
-	
+
 	public String getInventory()
 	{
 		return inventory;
 	}
-	
+
 	public void setInventory(String inventory)
 	{
 		this.inventory = inventory;
@@ -38,37 +38,37 @@ public class InventoryStorage extends RunsafeEntity
 	{
 		return experience;
 	}
-	
+
 	public void setExperience(float experience)
 	{
 		this.experience = experience;
 	}
-	
+
 	public int getLevel()
 	{
 		return level;
 	}
-	
+
 	public void setLevel(int level)
 	{
 		this.level = level;
 	}
-	
+
 	public String getArmor()
 	{
 		return armor;
 	}
-	
+
 	public void setArmor(String armor)
 	{
 		this.armor = armor;
 	}
-	
+
 	public boolean getSaved()
 	{
 		return saved;
 	}
-	
+
 	public void setSaved(boolean saved)
 	{
 		this.saved = saved;
@@ -84,6 +84,16 @@ public class InventoryStorage extends RunsafeEntity
 		this.stack = stack;
 	}
 
+	public byte[] getInventoryData()
+	{
+		return inventoryData;
+	}
+
+	public void setInventoryData(byte[] data)
+	{
+		inventoryData = data;
+	}
+
 	private String playerName;
 	private String worldName;
 	private String inventory;
@@ -92,4 +102,5 @@ public class InventoryStorage extends RunsafeEntity
 	private String armor;
 	private boolean saved;
 	private int stack;
+	private byte[] inventoryData;
 }

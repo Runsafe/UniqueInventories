@@ -2,15 +2,18 @@ package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.database.IDatabase;
 import no.runsafe.framework.database.IRepository;
+import no.runsafe.framework.database.ISchemaChanges;
 import no.runsafe.framework.output.IOutput;
-import no.runsafe.framework.server.player.RunsafePlayer;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
-public class TemplateRepository implements IRepository<InventoryStorage, String>
+public class TemplateRepository implements IRepository<InventoryStorage, String>, ISchemaChanges
 {
 	public TemplateRepository(IDatabase database, IOutput output, IUniverses universes)
 	{
@@ -97,6 +100,36 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 		{
 			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
 		}
+	}
+
+	@Override
+	public String getTableName()
+	{
+		return "uniqueInventoryTemplates";
+	}
+
+	@Override
+	public HashMap<Integer, List<String>> getSchemaUpdateQueries()
+	{
+		HashMap<Integer, List<String>> versions = new HashMap<Integer, List<String>>();
+		ArrayList<String> sql = new ArrayList<String>();
+		sql.add(
+			"CREATE TABLE `uniqueInventoryTemplates` (" +
+				"`inventoryName` varchar(255) NOT NULL," +
+				"`armor` longtext," +
+				"`inventory` longtext," +
+				"`level` int(10) unsigned NOT NULL DEFAULT '0'," +
+				"`experience` float unsigned NOT NULL DEFAULT '0'," +
+				"PRIMARY KEY (`inventoryName`)" +
+				")"
+		);
+		versions.put(1, sql);
+//		sql = new ArrayList<String>();
+//		sql.add("ALTER TABLE uniqueInventoryTemplates ADD COLUMN version int");
+//		sql.add("UPDATE uniqueInventories SET version = 1");
+//		sql.add("ALTER TABLE uniqueInventories ADD COLUMN serializedInventory MEDIUMBLOB");
+//		versions.put(2, sql);
+		return versions;
 	}
 
 	private InventoryStorage createInventory(String inventoryName) throws SQLException
