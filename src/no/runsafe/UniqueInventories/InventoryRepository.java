@@ -6,7 +6,6 @@ import no.runsafe.framework.database.ISchemaChanges;
 import no.runsafe.framework.output.IOutput;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
-import java.io.ByteArrayInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,7 +50,6 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 				inv.setExperience(set.getFloat("experience"));
 				inv.setSaved(set.getBoolean("saved"));
 				inv.setStack(set.getInt("stack"));
-//				inv.setInventoryData(set.getBytes("serializedInventory"));
 			}
 			else
 			{
@@ -83,7 +81,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 			);
 			PreparedStatement update = this.database.prepare(
 				"UPDATE uniqueInventories " +
-					"SET armor=?, inventory=?, level=?, experience=?, saved=?, stack=?, "  + //serializedInventory=? " +
+					"SET armor=?, inventory=?, level=?, experience=?, saved=?, stack=? " +
 					"WHERE playerName=? AND inventoryName=? AND stack=?"
 			);
 			update.setString(1, inventory.getArmor());
@@ -92,14 +90,6 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 			update.setFloat(4, inventory.getExperience());
 			update.setBoolean(5, inventory.getSaved());
 			update.setInt(6, inventory.getStack());
-//			if (inventory.getInventoryData() == null)
-//				update.setBytes(7, null);
-//			else
-//				update.setBinaryStream(
-//					7,
-//					new ByteArrayInputStream(inventory.getInventoryData()),
-//					inventory.getInventoryData().length
-//				);
 			update.setString(7, inventory.getPlayerName());
 			update.setString(8, universes.getInventoryName(inventory.getWorldName()));
 			update.setInt(9, inventory.getStack());
@@ -204,11 +194,6 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 				")"
 		);
 		versions.put(1, sql);
-//		sql = new ArrayList<String>();
-//		sql.add("ALTER TABLE uniqueInventories ADD COLUMN version int");
-//		sql.add("UPDATE uniqueInventories SET version = 1");
-//		sql.add("ALTER TABLE uniqueInventories ADD COLUMN serializedInventory MEDIUMBLOB");
-//		versions.put(2, sql);
 		return versions;
 	}
 }

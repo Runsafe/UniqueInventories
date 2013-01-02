@@ -37,7 +37,6 @@ public class InventoryHandler
 		storage.setLevel(player.getLevel());
 		storage.setArmor(this.flatPackArmor(player));
 		storage.setSaved(true);
-//		storage.setInventoryData(serializeItems(player.getRawPlayer().getInventory().getContents()));
 		this.repository.persist(storage);
 		if (player.hasPermission("runsafe.uniqueinventory.notices"))
 			player.sendMessage(String.format("Inventory for %s was saved.", theWorld.getName()));
@@ -70,15 +69,6 @@ public class InventoryHandler
 			player.setXP(stored.getExperience());
 			player.setLevel(stored.getLevel());
 			this.unPackToInventory(stored.getInventory(), stored.getArmor(), player);
-//			ItemStack[] inventory = deserializeItems(stored.getInventoryData());
-//			console.outputDebugToConsole(
-//				inventory == null ? "No inventory loaded!" : String.format("Loaded %d items [%s] from database", inventory.length),
-//				Level.FINE
-//			);
-//			if (inventory == null)
-//				player.getInventory().clear();
-//			else
-//				player.getRawPlayer().getInventory().setContents(inventory);
 			player.updateInventory();
 			stored.setSaved(false);
 			this.repository.persist(stored);
@@ -236,94 +226,6 @@ public class InventoryHandler
 		return itemStack;
 	}
 
-//	private byte[] serializeItems(ItemStack[] input)
-//	{
-//		ArrayList<Map<String, Object>> storage = new ArrayList<Map<String, Object>>();
-//		for (ItemStack item : input)
-//		{
-//			if (item == null)
-//				storage.add(null);
-//			else
-//				storage.add(bukkitSerialize(item));
-//		}
-//		try
-//		{
-//			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//			ObjectOutputStream out = new ObjectOutputStream(bos);
-//			out.writeObject(storage);
-//			out.flush();
-//			out.close();
-//			return bos.toByteArray();
-//		}
-//		catch (IOException e)
-//		{
-//			console.write("IOException: " + ExceptionUtils.getMessage(e) + ExceptionUtils.getFullStackTrace(e));
-//		}
-//		return null;
-//	}
-//
-//	private ItemStack[] deserializeItems(byte[] input)
-//	{
-//		if (input == null)
-//			return null;
-//		try
-//		{
-//			ByteArrayInputStream bis = new ByteArrayInputStream(input);
-//			ObjectInputStream in = new ObjectInputStream(bis);
-//			Object value = in.readObject();
-//			console.outputDebugToConsole(String.format("=== Deserialized object %s ===", value.getClass().getCanonicalName()), Level.FINE);
-//			ArrayList<Map<String, Object>> result = (ArrayList<Map<String, Object>>) value;
-//			in.close();
-//			ArrayList<ItemStack> items = new ArrayList<ItemStack>();
-//			for (Map<String, Object> item : result)
-//			{
-//				if (item == null)
-//					items.add(null);
-//				else
-//					items.add(bukkitDeserialize(item));
-//			}
-//		}
-//		catch (IOException e)
-//		{
-//			console.write("IOException: " + ExceptionUtils.getMessage(e) + ExceptionUtils.getFullStackTrace(e));
-//		}
-//		catch (ClassNotFoundException e)
-//		{
-//			console.write("ClassNotFoundException: " + ExceptionUtils.getMessage(e) + ExceptionUtils.getFullStackTrace(e));
-//		}
-//		return null;
-//	}
-//
-//	private Map<String, Object> bukkitSerialize(ItemStack input)
-//	{
-//		if (input == null)
-//			return null;
-//
-//		console.outputDebugToConsole(String.format("Processing %s", input.getClass().getCanonicalName()), Level.FINE);
-//		Map<String, Object> data = input.serialize();
-//		if (data.containsKey("meta"))
-//		{
-//			Object meta = data.get("meta");
-//			if (meta instanceof ItemMeta)
-//				data.put("meta", ((ItemMeta) meta).serialize());
-//		}
-//		return data;
-//	}
-//
-//	private ItemStack bukkitDeserialize(Map<String, Object> data)
-//	{
-//		if (data.containsKey("meta"))
-//		{
-//			Object meta = data.get("meta");
-//			if (meta instanceof Map)
-//			{
-//				meta = ConfigurationSerialization.deserializeObject((Map<String, Object>) meta);
-//				data.put("meta", meta);
-//			}
-//		}
-//		return ItemStack.deserialize(data);
-//	}
-
 	private String flattenItem(ItemStack theItem)
 	{
 		//0&61:22:0:0:0
@@ -378,10 +280,7 @@ public class InventoryHandler
 		{
 			ItemStack theItem = itemStackIterator.next();
 			if (theItem != null)
-//			{
-//				itemPack.put(currentIndex, bukkitSerialize(theItem));
 				itemData.add(String.format("%s&%s", currentIndex, flattenItem(theItem)));
-//			}
 			currentIndex++;
 		}
 

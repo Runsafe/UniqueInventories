@@ -84,16 +84,6 @@ public class InventoryStorage extends RunsafeEntity
 		this.stack = stack;
 	}
 
-	public byte[] getInventoryData()
-	{
-		return inventoryData;
-	}
-
-	public void setInventoryData(byte[] data)
-	{
-		inventoryData = data;
-	}
-
 	private String playerName;
 	private String worldName;
 	private String inventory;
@@ -102,5 +92,4 @@ public class InventoryStorage extends RunsafeEntity
 	private String armor;
 	private boolean saved;
 	private int stack;
-	private byte[] inventoryData;
 }
