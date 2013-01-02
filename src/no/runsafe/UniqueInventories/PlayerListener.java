@@ -2,25 +2,23 @@ package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.event.player.IPlayerChangedWorldEvent;
 import no.runsafe.framework.event.player.IPlayerDropItemEvent;
+import no.runsafe.framework.event.player.IPlayerMove;
+import no.runsafe.framework.server.RunsafeLocation;
 import no.runsafe.framework.server.RunsafeWorld;
 import no.runsafe.framework.server.event.player.RunsafePlayerChangedWorldEvent;
 import no.runsafe.framework.server.event.player.RunsafePlayerDropItemEvent;
 import no.runsafe.framework.server.player.RunsafePlayer;
+import no.runsafe.framework.timer.ForegroundWorker;
 import no.runsafe.framework.timer.IScheduler;
 
 import java.util.ArrayList;
 
-public class PlayerListener implements IPlayerChangedWorldEvent, IPlayerDropItemEvent
+public class PlayerListener extends ForegroundWorker<String, RunsafePlayer> implements IPlayerChangedWorldEvent, IPlayerDropItemEvent, IPlayerMove
 {
-	private InventoryHandler inventoryHandler = null;
-	private final ArrayList<String> limitedPlayers = new ArrayList<String>();
-	private final IScheduler scheduler;
-	private final IUniverses universes;
-
 	public PlayerListener(IScheduler scheduler, InventoryHandler inventoryHandler, IUniverses universes)
 	{
+		super(scheduler);
 		this.inventoryHandler = inventoryHandler;
-		this.scheduler = scheduler;
 		this.universes = universes;
 	}
 
@@ -35,12 +33,18 @@ public class PlayerListener implements IPlayerChangedWorldEvent, IPlayerDropItem
 	}
 
 	@Override
+	public boolean OnPlayerMove(RunsafePlayer player, RunsafeLocation from, RunsafeLocation to)
+	{
+		if (limitedPlayers.contains(player.getName()) && !isQueued(player.getName()))
+			Push(player.getName(), player);
+		return true;
+	}
+
+	@Override
 	public void OnPlayerDropItem(RunsafePlayerDropItemEvent event)
 	{
 		if (this.limitedPlayers.contains(event.getPlayer().getName()))
-		{
 			event.setCancelled(true);
-		}
 	}
 
 	private void saveInventory(RunsafePlayer player, RunsafeWorld fromWorld)
@@ -50,17 +54,18 @@ public class PlayerListener implements IPlayerChangedWorldEvent, IPlayerDropItem
 
 	private void updateInventory(final RunsafePlayer player)
 	{
-		this.limitedPlayers.add(player.getName());
-		this.scheduler.startSyncTask(
-			new Runnable()
-			{
-				public void run()
-				{
-					inventoryHandler.loadInventory(player);
-					limitedPlayers.remove(player.getName());
-				}
-			},
-			2L
-		);
+		limitedPlayers.add(player.getName());
+		Push(player.getName(), player);
 	}
+
+	@Override
+	public void process(String name, RunsafePlayer player)
+	{
+		inventoryHandler.loadInventory(player);
+		limitedPlayers.remove(name);
+	}
+
+	private InventoryHandler inventoryHandler = null;
+	private final ArrayList<String> limitedPlayers = new ArrayList<String>();
+	private final IUniverses universes;
 }
