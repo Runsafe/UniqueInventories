@@ -3,6 +3,7 @@ package no.runsafe.UniqueInventories;
 import no.runsafe.framework.database.IRepository;
 import no.runsafe.framework.server.RunsafeWorld;
 import no.runsafe.framework.server.player.RunsafePlayer;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.Inventory;
@@ -13,10 +14,6 @@ import java.util.*;
 
 public class InventoryHandler
 {
-
-	private IRepository<InventoryStorage, RunsafePlayer> repository = null;
-	private IRepository<InventoryStorage, String> templates = null;
-
 	public InventoryHandler(
 		IRepository<InventoryStorage, RunsafePlayer> repository,
 		IRepository<InventoryStorage, String> templates
@@ -40,7 +37,10 @@ public class InventoryHandler
 		storage.setLevel(player.getLevel());
 		storage.setArmor(this.flatPackArmor(player));
 		storage.setSaved(true);
+//		storage.setInventoryData(serializeItems(player.getRawPlayer().getInventory().getContents()));
 		this.repository.persist(storage);
+		if (player.hasPermission("runsafe.uniqueinventory.notices"))
+			player.sendMessage(String.format("Inventory for %s was saved.", theWorld.getName()));
 	}
 
 	public void resetPlayersInventory(RunsafePlayer player)
@@ -48,10 +48,13 @@ public class InventoryHandler
 		if (player == null || player.getInventory() == null)
 			return;
 
+		player.removeBuffs();
 		player.setXP(0.0F);
 		player.setLevel(0);
 		player.getInventory().clear();
 		player.updateInventory();
+		if (player.hasPermission("runsafe.uniqueinventory.notices"))
+			player.sendMessage("Your inventory has been cleared.");
 	}
 
 	public void loadInventory(RunsafePlayer player)
@@ -63,11 +66,24 @@ public class InventoryHandler
 
 		if (stored != null)
 		{
+			player.removeBuffs();
 			player.setXP(stored.getExperience());
 			player.setLevel(stored.getLevel());
 			this.unPackToInventory(stored.getInventory(), stored.getArmor(), player);
+//			ItemStack[] inventory = deserializeItems(stored.getInventoryData());
+//			console.outputDebugToConsole(
+//				inventory == null ? "No inventory loaded!" : String.format("Loaded %d items [%s] from database", inventory.length),
+//				Level.FINE
+//			);
+//			if (inventory == null)
+//				player.getInventory().clear();
+//			else
+//				player.getRawPlayer().getInventory().setContents(inventory);
+			player.updateInventory();
 			stored.setSaved(false);
 			this.repository.persist(stored);
+			if (player.hasPermission("runsafe.uniqueinventory.notices"))
+				player.sendMessage(String.format("Inventory for %s was loaded.", stored.getWorldName()));
 		}
 		else
 		{
@@ -78,12 +94,15 @@ public class InventoryHandler
 	public void loadTemplateInventory(RunsafePlayer player)
 	{
 		InventoryStorage stored = this.templates.get(player.getWorld().getName());
+		player.removeBuffs();
 
 		if (stored != null)
 		{
 			player.setXP(stored.getExperience());
 			player.setLevel(stored.getLevel());
 			this.unPackToInventory(stored.getInventory(), stored.getArmor(), player);
+			if (player.hasPermission("runsafe.uniqueinventory.notices"))
+				player.sendMessage(String.format("Default inventory for %s was loaded.", stored.getWorldName()));
 		}
 	}
 
@@ -97,6 +116,8 @@ public class InventoryHandler
 		storage.setLevel(player.getLevel());
 		storage.setArmor(this.flatPackArmor(player));
 		this.templates.persist(storage);
+		if (player.hasPermission("runsafe.uniqueinventory.notices"))
+			player.sendMessage(String.format("Default inventory for %s was updated.", storage.getWorldName()));
 	}
 
 	public void PushInventory(RunsafePlayer player)
@@ -105,6 +126,8 @@ public class InventoryHandler
 		{
 			saveInventory(player, player.getWorld());
 			((InventoryRepository) repository).addStack(player);
+			if (player.hasPermission("runsafe.uniqueinventory.notices"))
+				player.sendMessage("Inventory pushed to the stack");
 			loadInventory(player);
 		}
 	}
@@ -113,7 +136,11 @@ public class InventoryHandler
 	{
 		InventoryStorage inventory = repository.get(player);
 		if (inventory.getStack() > 0)
+		{
 			repository.delete(inventory);
+			if (player.hasPermission("runsafe.uniqueinventory.notices"))
+				player.sendMessage("Inventory popped from the stack");
+		}
 		loadInventory(player);
 	}
 
@@ -130,7 +157,7 @@ public class InventoryHandler
 				enchantStrings.add(String.format("%s#%s", theEnchant.getId(), enchantData));
 			}
 
-			return Join(enchantStrings, "@");
+			return StringUtils.join(enchantStrings, "@");
 		}
 		else
 		{
@@ -209,6 +236,94 @@ public class InventoryHandler
 		return itemStack;
 	}
 
+//	private byte[] serializeItems(ItemStack[] input)
+//	{
+//		ArrayList<Map<String, Object>> storage = new ArrayList<Map<String, Object>>();
+//		for (ItemStack item : input)
+//		{
+//			if (item == null)
+//				storage.add(null);
+//			else
+//				storage.add(bukkitSerialize(item));
+//		}
+//		try
+//		{
+//			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//			ObjectOutputStream out = new ObjectOutputStream(bos);
+//			out.writeObject(storage);
+//			out.flush();
+//			out.close();
+//			return bos.toByteArray();
+//		}
+//		catch (IOException e)
+//		{
+//			console.write("IOException: " + ExceptionUtils.getMessage(e) + ExceptionUtils.getFullStackTrace(e));
+//		}
+//		return null;
+//	}
+//
+//	private ItemStack[] deserializeItems(byte[] input)
+//	{
+//		if (input == null)
+//			return null;
+//		try
+//		{
+//			ByteArrayInputStream bis = new ByteArrayInputStream(input);
+//			ObjectInputStream in = new ObjectInputStream(bis);
+//			Object value = in.readObject();
+//			console.outputDebugToConsole(String.format("=== Deserialized object %s ===", value.getClass().getCanonicalName()), Level.FINE);
+//			ArrayList<Map<String, Object>> result = (ArrayList<Map<String, Object>>) value;
+//			in.close();
+//			ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+//			for (Map<String, Object> item : result)
+//			{
+//				if (item == null)
+//					items.add(null);
+//				else
+//					items.add(bukkitDeserialize(item));
+//			}
+//		}
+//		catch (IOException e)
+//		{
+//			console.write("IOException: " + ExceptionUtils.getMessage(e) + ExceptionUtils.getFullStackTrace(e));
+//		}
+//		catch (ClassNotFoundException e)
+//		{
+//			console.write("ClassNotFoundException: " + ExceptionUtils.getMessage(e) + ExceptionUtils.getFullStackTrace(e));
+//		}
+//		return null;
+//	}
+//
+//	private Map<String, Object> bukkitSerialize(ItemStack input)
+//	{
+//		if (input == null)
+//			return null;
+//
+//		console.outputDebugToConsole(String.format("Processing %s", input.getClass().getCanonicalName()), Level.FINE);
+//		Map<String, Object> data = input.serialize();
+//		if (data.containsKey("meta"))
+//		{
+//			Object meta = data.get("meta");
+//			if (meta instanceof ItemMeta)
+//				data.put("meta", ((ItemMeta) meta).serialize());
+//		}
+//		return data;
+//	}
+//
+//	private ItemStack bukkitDeserialize(Map<String, Object> data)
+//	{
+//		if (data.containsKey("meta"))
+//		{
+//			Object meta = data.get("meta");
+//			if (meta instanceof Map)
+//			{
+//				meta = ConfigurationSerialization.deserializeObject((Map<String, Object>) meta);
+//				data.put("meta", meta);
+//			}
+//		}
+//		return ItemStack.deserialize(data);
+//	}
+
 	private String flattenItem(ItemStack theItem)
 	{
 		//0&61:22:0:0:0
@@ -233,12 +348,12 @@ public class InventoryHandler
 			prePackedArmor.add(String.format("%s&%s", i, flattenItem(armor[i])));
 		}
 
-		return Join(prePackedArmor, ",");
+		return StringUtils.join(prePackedArmor, ",");
 	}
 
 	private void unpackArmorToPlayer(String armorImport, RunsafePlayer player)
 	{
-		if(armorImport == null || armorImport.isEmpty())
+		if (armorImport == null || armorImport.isEmpty())
 			armorImport = "0&0:0:-1:0:0,1&0:0:-1:0:0,2&0:0:-1:0:0,3&0:0:-1:0:0";
 
 		ItemStack[] armorPack = new ItemStack[4];
@@ -257,34 +372,22 @@ public class InventoryHandler
 
 		ArrayList<String> itemData = new ArrayList<String>();
 		Iterator<ItemStack> itemStackIterator = playerInventory.iterator();
-
+		HashMap<Integer, Object> itemPack = new HashMap<Integer, Object>();
 		int currentIndex = 0;
 		while (itemStackIterator.hasNext())
 		{
 			ItemStack theItem = itemStackIterator.next();
-
 			if (theItem != null)
-			{
+//			{
+//				itemPack.put(currentIndex, bukkitSerialize(theItem));
 				itemData.add(String.format("%s&%s", currentIndex, flattenItem(theItem)));
-			}
+//			}
 			currentIndex++;
 		}
 
-		return Join(itemData, ",");
+		return StringUtils.join(itemData, ",");
 	}
 
-	private String Join(ArrayList<String> coll, String delimiter)
-	{
-		if (coll.isEmpty())
-			return "";
-
-		StringBuilder sb = new StringBuilder();
-
-		for (String x : coll)
-			sb.append(x).append(delimiter);
-
-		sb.delete(sb.length() - delimiter.length(), sb.length());
-
-		return sb.toString();
-	}
+	private IRepository<InventoryStorage, RunsafePlayer> repository = null;
+	private IRepository<InventoryStorage, String> templates = null;
 }
