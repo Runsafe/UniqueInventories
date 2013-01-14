@@ -1,27 +1,22 @@
 package no.runsafe.UniqueInventories.Command;
 
 import no.runsafe.UniqueInventories.InventoryRepository;
-import no.runsafe.framework.command.RunsafeCommand;
-import no.runsafe.framework.command.RunsafePlayerCommand;
-import no.runsafe.framework.output.IOutput;
+import no.runsafe.framework.command.player.PlayerAsyncCommand;
 import no.runsafe.framework.server.player.RunsafePlayer;
+import no.runsafe.framework.timer.IScheduler;
 
-public class ListCommand extends RunsafePlayerCommand
+import java.util.HashMap;
+
+public class ListCommand extends PlayerAsyncCommand
 {
-	public ListCommand(InventoryRepository repository)
+	public ListCommand(InventoryRepository repository, IScheduler scheduler)
 	{
-		super("list");
+		super("list", "Lists how many inventories you have in your stack", "uniqueinventories.stack", scheduler);
 		this.repository = repository;
 	}
 
 	@Override
-	public String requiredPermission()
-	{
-		return "uniqueinventories.stack";
-	}
-
-	@Override
-	public String OnExecute(RunsafePlayer executor, String[] args)
+	public String OnAsyncExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
 	{
 		return String.format("%s inventories stored", repository.get(executor).getStack() + 1);
 	}

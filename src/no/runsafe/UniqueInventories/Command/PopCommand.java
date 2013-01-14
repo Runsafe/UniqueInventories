@@ -1,26 +1,21 @@
 package no.runsafe.UniqueInventories.Command;
 
 import no.runsafe.UniqueInventories.InventoryHandler;
-import no.runsafe.framework.command.RunsafeCommand;
-import no.runsafe.framework.command.RunsafePlayerCommand;
+import no.runsafe.framework.command.player.PlayerCommand;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
-public class PopCommand extends RunsafePlayerCommand
+import java.util.HashMap;
+
+public class PopCommand extends PlayerCommand
 {
 	public PopCommand(InventoryHandler inventoryHandler)
 	{
-		super("pop");
+		super("pop", "Loads the inventory on top of your stack", "uniqueinventories.stack");
 		handler = inventoryHandler;
 	}
 
 	@Override
-	public String requiredPermission()
-	{
-		return "uniqueinventories.stack";
-	}
-
-	@Override
-	public String OnExecute(RunsafePlayer executor, String[] args)
+	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
 	{
 		handler.PopInventory(executor);
 		return "Inventory restored";

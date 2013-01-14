@@ -1,29 +1,21 @@
 package no.runsafe.UniqueInventories.Command.Template;
 
 import no.runsafe.UniqueInventories.InventoryHandler;
-import no.runsafe.framework.command.ICommand;
-import no.runsafe.framework.command.RunsafeCommand;
-import no.runsafe.framework.command.RunsafePlayerCommand;
+import no.runsafe.framework.command.player.PlayerCommand;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
-import java.util.Collection;
+import java.util.HashMap;
 
-public class SaveCommand extends RunsafePlayerCommand
+public class SaveCommand extends PlayerCommand
 {
 	public SaveCommand(InventoryHandler handler)
 	{
-		super("save");
+		super("load", "Saves your inventory as the current worlds inventory template ", "uniqueinventories.template");
 		this.handler = handler;
 	}
 
 	@Override
-	public String requiredPermission()
-	{
-		return "uniqueinventories.template";
-	}
-
-	@Override
-	public String OnExecute(RunsafePlayer executor, String[] args)
+	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
 	{
 		handler.saveTemplateInventory(executor);
 		handler.PopInventory(executor);

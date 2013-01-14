@@ -1,28 +1,21 @@
 package no.runsafe.UniqueInventories.Command;
 
 import no.runsafe.UniqueInventories.InventoryHandler;
-import no.runsafe.framework.command.RunsafeAsyncPlayerCommand;
-import no.runsafe.framework.command.RunsafePlayerCommand;
+import no.runsafe.framework.command.player.PlayerCommand;
 import no.runsafe.framework.server.player.RunsafePlayer;
-import no.runsafe.framework.timer.IScheduler;
 
-public class ClearInventory extends RunsafePlayerCommand
+import java.util.HashMap;
+
+public class ClearInventory extends PlayerCommand
 {
-
 	public ClearInventory(InventoryHandler inventoryHandler)
 	{
-		super("clearinventory");
+		super("clearinventory", "Clears your inventory", "uniqueinventories.clearinventory");
 		handler = inventoryHandler;
 	}
 
 	@Override
-	public String requiredPermission()
-	{
-		return "uniqueinventories.clearinventory";
-	}
-
-	@Override
-	public String OnExecute(RunsafePlayer executor, String[] args)
+	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
 	{
 		handler.resetPlayersInventory(executor);
 		return null;
