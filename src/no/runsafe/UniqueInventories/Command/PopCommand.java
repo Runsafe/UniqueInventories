@@ -15,7 +15,7 @@ public class PopCommand extends PlayerCommand
 	}
 
 	@Override
-	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
+	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters)
 	{
 		handler.PopInventory(executor);
 		return "Inventory restored";

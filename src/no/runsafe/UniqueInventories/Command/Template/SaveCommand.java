@@ -15,7 +15,7 @@ public class SaveCommand extends PlayerCommand
 	}
 
 	@Override
-	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
+	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters)
 	{
 		handler.saveTemplateInventory(executor);
 		handler.PopInventory(executor);

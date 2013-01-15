@@ -15,7 +15,7 @@ public class LoadCommand extends PlayerCommand
 	}
 
 	@Override
-	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] args)
+	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters)
 	{
 		handler.PushInventory(executor);
 		handler.loadTemplateInventory(executor);

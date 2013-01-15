@@ -16,7 +16,7 @@ public class ListCommand extends PlayerAsyncCommand
 	}
 
 	@Override
-	public String OnAsyncExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
+	public String OnAsyncExecute(RunsafePlayer executor, HashMap<String, String> parameters)
 	{
 		return String.format("%s inventories stored", repository.get(executor).getStack() + 1);
 	}

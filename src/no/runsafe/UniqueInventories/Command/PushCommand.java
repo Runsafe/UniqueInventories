@@ -15,7 +15,7 @@ public class PushCommand extends PlayerCommand
 	}
 
 	@Override
-	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters, String[] arguments)
+	public String OnExecute(RunsafePlayer executor, HashMap<String, String> parameters)
 	{
 		inventoryHandler.PushInventory(executor);
 		return "Inventory stored";
