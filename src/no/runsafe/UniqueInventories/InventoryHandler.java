@@ -2,13 +2,13 @@ package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.database.IRepository;
 import no.runsafe.framework.server.RunsafeWorld;
+import no.runsafe.framework.server.item.RunsafeItemStack;
 import no.runsafe.framework.server.player.RunsafePlayer;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 import java.util.*;
 
@@ -212,6 +212,7 @@ public class InventoryHandler
 
 	private ItemStack unpackItem(String itemString)
 	{
+		/*
 		String[] itemData = itemString.split(":");
 		int itemID = Integer.parseInt(itemData[0]);
 		ItemStack itemStack = new ItemStack(itemID);
@@ -223,21 +224,23 @@ public class InventoryHandler
 		if (itemData.length > 4 && !itemData[4].equals("0"))
 			itemStack.addEnchantments(unpackEnchants(itemData[4]));
 
-		return itemStack;
+		return itemStack;*/
+		return RunsafeItemStack.deserialize(itemString).getRaw();
 	}
 
 	private String flattenItem(ItemStack theItem)
 	{
 		//0&61:22:0:0:0
 		//SlotID & ItemID:Amount:Durability:Data:Enchants
-
+/*
 		int itemID = theItem.getTypeId();
 		int itemAmount = theItem.getAmount();
 		int durability = theItem.getDurability();
 		byte data = theItem.getData().getData();
 		String enchants = flattenEnchants(theItem.getEnchantments());
 
-		return String.format("%s:%s:%s:%s:%s", itemID, itemAmount, durability, data, enchants);
+		return String.format("%s:%s:%s:%s:%s", itemID, itemAmount, durability, data, enchants); */
+		return new RunsafeItemStack(theItem).serialize();
 	}
 
 	private String flatPackArmor(RunsafePlayer player)
