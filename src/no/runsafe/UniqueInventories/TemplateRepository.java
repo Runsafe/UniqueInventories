@@ -36,8 +36,7 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 			{
 				inv.setPlayerName(null);
 				inv.setWorldName(set.getString("inventoryName"));
-				inv.setArmor(set.getString("armor"));
-				inv.setInventory(set.getString("inventory"));
+				inv.setInventoryYaml(set.getString("inventory_yaml"));
 				inv.setLevel(set.getInt("level"));
 				inv.setExperience(set.getFloat("experience"));
 				inv.setSaved(true);
@@ -70,13 +69,12 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 				Level.FINE
 			);
 			PreparedStatement update = this.database.prepare(
-				"UPDATE uniqueInventoryTemplates SET armor=?, inventory=?, level=?, experience=? WHERE inventoryName=?"
+				"UPDATE uniqueInventoryTemplates SET inventory_yaml=?, level=?, experience=? WHERE inventoryName=?"
 			);
-			update.setString(1, inventory.getArmor());
-			update.setString(2, inventory.getInventory());
-			update.setLong(3, inventory.getLevel());
-			update.setFloat(4, inventory.getExperience());
-			update.setString(8, universes.getInventoryName(inventory.getWorldName()));
+			update.setString(1, inventory.getInventoryYaml());
+			update.setLong(2, inventory.getLevel());
+			update.setFloat(3, inventory.getExperience());
+			update.setString(4, universes.getInventoryName(inventory.getWorldName()));
 			update.execute();
 		}
 		catch (SQLException e)
@@ -124,11 +122,9 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 				")"
 		);
 		versions.put(1, sql);
-//		sql = new ArrayList<String>();
-//		sql.add("ALTER TABLE uniqueInventoryTemplates ADD COLUMN version int");
-//		sql.add("UPDATE uniqueInventories SET version = 1");
-//		sql.add("ALTER TABLE uniqueInventories ADD COLUMN serializedInventory MEDIUMBLOB");
-//		versions.put(2, sql);
+		sql = new ArrayList<String>();
+		sql.add("ALTER TABLE uniqueInventories ADD COLUMN inventory_yaml longtext");
+		versions.put(2, sql);
 		return versions;
 	}
 

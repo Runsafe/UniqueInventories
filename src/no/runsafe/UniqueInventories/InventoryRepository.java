@@ -50,6 +50,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 				inv.setExperience(set.getFloat("experience"));
 				inv.setSaved(set.getBoolean("saved"));
 				inv.setStack(set.getInt("stack"));
+				inv.setInventoryYaml(set.getString("yaml_inventory"));
 			}
 			else
 			{
@@ -81,7 +82,7 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 			);
 			PreparedStatement update = this.database.prepare(
 				"UPDATE uniqueInventories " +
-					"SET armor=?, inventory=?, level=?, experience=?, saved=?, stack=? " +
+					"SET armor=?, inventory=?, level=?, experience=?, saved=?, stack=?, yaml_inventory=?, version=? " +
 					"WHERE playerName=? AND inventoryName=? AND stack=?"
 			);
 			update.setString(1, inventory.getArmor());
@@ -90,9 +91,11 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 			update.setFloat(4, inventory.getExperience());
 			update.setBoolean(5, inventory.getSaved());
 			update.setInt(6, inventory.getStack());
-			update.setString(7, inventory.getPlayerName());
-			update.setString(8, universes.getInventoryName(inventory.getWorldName()));
-			update.setInt(9, inventory.getStack());
+			update.setString(7, inventory.getInventoryYaml());
+			update.setInt(8, inventory.getVersion());
+			update.setString(9, inventory.getPlayerName());
+			update.setString(10, universes.getInventoryName(inventory.getWorldName()));
+			update.setInt(11, inventory.getStack());
 			update.execute();
 		}
 		catch (SQLException e)
@@ -144,14 +147,44 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 		insert.setString(1, playerName);
 		insert.setString(2, inventoryName);
 		insert.setInt(3, stack);
+		insert.setInt(4, VERSION);
 		insert.executeUpdate();
 		insert.close();
 		return inv;
 	}
 
-	private final IDatabase database;
-	private final IOutput output;
-	private final IUniverses universes;
+	public List<InventoryStorage> getByVersion(int version)
+	{
+		try
+		{
+			PreparedStatement select = this.database.prepare("SELECT * FROM uniqueInventories WHERE version=? ORDER BY stack DESC");
+			select.setInt(1, version);
+			ResultSet set = select.executeQuery();
+			ArrayList<InventoryStorage> results = new ArrayList<InventoryStorage>();
+			while (set.next())
+			{
+				InventoryStorage inv = new InventoryStorage();
+				inv.setPlayerName(set.getString("playerName"));
+				inv.setWorldName(set.getString("inventoryName"));
+				inv.setArmor(set.getString("armor"));
+				inv.setInventory(set.getString("inventory"));
+				inv.setLevel(set.getInt("level"));
+				inv.setExperience(set.getFloat("experience"));
+				inv.setSaved(set.getBoolean("saved"));
+				inv.setStack(set.getInt("stack"));
+				inv.setVersion(set.getInt("version"));
+				inv.setInventoryYaml(set.getString("yaml_inventory"));
+				results.add(inv);
+			}
+			select.close();
+			return results;
+		}
+		catch (SQLException e)
+		{
+			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
+		}
+		return null;
+	}
 
 	public void Wipe(String world)
 	{
@@ -194,6 +227,15 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 				")"
 		);
 		versions.put(1, sql);
+		sql = new ArrayList<String>();
+		sql.add("ALTER TABLE uniqueInventories ADD COLUMN `version` int(10) NOT NULL default 1");
+		sql.add("ALTER TABLE uniqueInventories ADD COLUMN `yaml_inventory` longtext");
+		versions.put(2, sql);
 		return versions;
 	}
+
+	private static final int VERSION = 2;
+	private final IDatabase database;
+	private final IOutput output;
+	private final IUniverses universes;
 }

@@ -84,6 +84,26 @@ public class InventoryStorage extends RunsafeEntity
 		this.stack = stack;
 	}
 
+	public int getVersion()
+	{
+		return version;
+	}
+
+	public void setVersion(int version)
+	{
+		this.version = version;
+	}
+
+	public String getInventoryYaml()
+	{
+		return inventory_yaml;
+	}
+
+	public void setInventoryYaml(String yaml)
+	{
+		inventory_yaml = yaml;
+	}
+
 	private String playerName;
 	private String worldName;
 	private String inventory;
@@ -92,4 +112,6 @@ public class InventoryStorage extends RunsafeEntity
 	private String armor;
 	private boolean saved;
 	private int stack;
+	private int version;
+	private String inventory_yaml;
 }
