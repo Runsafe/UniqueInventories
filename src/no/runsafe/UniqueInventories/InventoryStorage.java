@@ -1,8 +1,6 @@
 package no.runsafe.UniqueInventories;
 
-import no.runsafe.framework.database.RunsafeEntity;
-
-public class InventoryStorage extends RunsafeEntity
+public class InventoryStorage
 {
 	public String getPlayerName()
 	{

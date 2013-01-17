@@ -1,8 +1,7 @@
 package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.database.IDatabase;
-import no.runsafe.framework.database.IRepository;
-import no.runsafe.framework.database.ISchemaChanges;
+import no.runsafe.framework.database.Repository;
 import no.runsafe.framework.output.IOutput;
 import no.runsafe.framework.server.player.RunsafePlayer;
 
@@ -14,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
-public class InventoryRepository implements IRepository<InventoryStorage, RunsafePlayer>, ISchemaChanges
+public class InventoryRepository extends Repository
 {
 	public InventoryRepository(IDatabase database, IOutput output, IUniverses universes)
 	{
@@ -23,7 +22,6 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 		this.universes = universes;
 	}
 
-	@Override
 	public InventoryStorage get(RunsafePlayer key)
 	{
 		return get(key, key.getWorld().getName());
@@ -66,7 +64,6 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 		return null;
 	}
 
-	@Override
 	public void persist(InventoryStorage inventory)
 	{
 		try
@@ -104,7 +101,6 @@ public class InventoryRepository implements IRepository<InventoryStorage, Runsaf
 		}
 	}
 
-	@Override
 	public void delete(InventoryStorage inventory)
 	{
 		try

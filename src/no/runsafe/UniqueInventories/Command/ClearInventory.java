@@ -21,5 +21,5 @@ public class ClearInventory extends PlayerCommand
 		return null;
 	}
 
-	InventoryHandler handler;
+	private final InventoryHandler handler;
 }

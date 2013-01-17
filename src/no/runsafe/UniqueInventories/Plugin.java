@@ -15,6 +15,7 @@ public class Plugin extends RunsafeConfigurablePlugin implements IConfigurationF
 		addComponent(InventoryHandler.class);
 		addComponent(PlayerListener.class);
 		addComponent(InventoryRepository.class);
+		addComponent(TemplateRepository.class);
 		addComponent(InventoryUniverses.class);
 		addComponent(ClearInventory.class);
 

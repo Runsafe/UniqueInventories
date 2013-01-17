@@ -1,6 +1,5 @@
 package no.runsafe.UniqueInventories;
 
-import no.runsafe.framework.database.IRepository;
 import no.runsafe.framework.event.IPluginEnabled;
 import no.runsafe.framework.output.IOutput;
 import no.runsafe.framework.server.RunsafeWorld;
@@ -19,11 +18,7 @@ import java.util.Map;
 
 public class InventoryHandler implements IPluginEnabled
 {
-	public InventoryHandler(
-		IRepository<InventoryStorage, RunsafePlayer> repository,
-		IRepository<InventoryStorage, String> templates,
-		IOutput output
-	)
+	public InventoryHandler(InventoryRepository repository, TemplateRepository templates, IOutput output)
 	{
 		this.repository = repository;
 		this.templates = templates;
@@ -32,11 +27,7 @@ public class InventoryHandler implements IPluginEnabled
 
 	public void saveInventory(RunsafePlayer player, RunsafeWorld theWorld)
 	{
-		InventoryStorage storage;
-		if (repository instanceof InventoryRepository)
-			storage = ((InventoryRepository) repository).get(player, theWorld.getName());
-		else
-			storage = new InventoryStorage();
+		InventoryStorage storage = repository.get(player, theWorld.getName());
 		storage.setPlayerName(player.getName());
 		storage.setWorldName(theWorld.getName());
 		storage.setExperience(player.getXP());
@@ -64,28 +55,7 @@ public class InventoryHandler implements IPluginEnabled
 
 	public void loadInventory(RunsafePlayer player)
 	{
-		InventoryStorage stored = this.repository.get(player);
-
-		if (stored != null && !stored.getSaved())
-			return;
-
-		if (stored != null)
-		{
-			player.removeBuffs();
-			player.setXP(stored.getExperience());
-			player.setLevel(stored.getLevel());
-			if (stored.getInventoryYaml() != null)
-				player.getInventory().unserialize(stored.getInventoryYaml());
-			player.updateInventory();
-			stored.setSaved(false);
-			this.repository.persist(stored);
-			if (player.hasPermission("runsafe.uniqueinventory.notices"))
-				player.sendMessage(String.format("Inventory for %s was loaded.", stored.getWorldName()));
-		}
-		else
-		{
-			loadTemplateInventory(player);
-		}
+		loadInventory(player, this.repository.get(player));
 	}
 
 	public void loadTemplateInventory(RunsafePlayer player)
@@ -118,14 +88,10 @@ public class InventoryHandler implements IPluginEnabled
 
 	public void PushInventory(RunsafePlayer player)
 	{
-		if (repository instanceof InventoryRepository)
-		{
-			saveInventory(player, player.getWorld());
-			((InventoryRepository) repository).addStack(player);
-			if (player.hasPermission("runsafe.uniqueinventory.notices"))
-				player.sendMessage("Inventory pushed to the stack");
-			loadInventory(player);
-		}
+		saveInventory(player, player.getWorld());
+		loadInventory(player, repository.addStack(player));
+		if (player.hasPermission("runsafe.uniqueinventory.notices"))
+			player.sendMessage("Inventory pushed to the stack");
 	}
 
 	public void PopInventory(RunsafePlayer player)
@@ -146,13 +112,13 @@ public class InventoryHandler implements IPluginEnabled
 	{
 		console.write("Upgrading Unique Inventories..");
 		String[] armorSlots = new String[]{"helmet", "chestplate", "leggings", "boots"};
-		List<InventoryStorage> toconvert = ((InventoryRepository) repository).getByVersion(1);
+		List<InventoryStorage> toConvert = repository.getByVersion(1);
 		int count = 0;
-		for (InventoryStorage convert : toconvert)
+		for (InventoryStorage convert : toConvert)
 		{
 			count++;
 			if (count % 500 == 0)
-				console.write(String.format("Processing %d/%d (%.2f%%)", count, toconvert.size(), 100.0 * count / toconvert.size()));
+				console.write(String.format("Processing %d/%d (%.2f%%)", count, toConvert.size(), 100.0 * count / toConvert.size()));
 			try
 			{
 				YamlConfiguration serialize = new YamlConfiguration();
@@ -200,7 +166,30 @@ public class InventoryHandler implements IPluginEnabled
 		console.write(String.format("Converted %d inventories.", count));
 	}
 
-	@Deprecated
+	private void loadInventory(RunsafePlayer player, InventoryStorage stored)
+	{
+		if (stored != null && !stored.getSaved())
+			return;
+
+		if (stored != null)
+		{
+			player.removeBuffs();
+			player.setXP(stored.getExperience());
+			player.setLevel(stored.getLevel());
+			if (stored.getInventoryYaml() != null)
+				player.getInventory().unserialize(stored.getInventoryYaml());
+			player.updateInventory();
+			stored.setSaved(false);
+			this.repository.persist(stored);
+			if (player.hasPermission("runsafe.uniqueinventory.notices"))
+				player.sendMessage(String.format("Inventory for %s was loaded.", stored.getWorldName()));
+		}
+		else
+		{
+			loadTemplateInventory(player);
+		}
+	}
+
 	private Map<Enchantment, Integer> unpackEnchants(String enchantString)
 	{
 		Map<Enchantment, Integer> returnEnchants = new HashMap<Enchantment, Integer>();
@@ -215,7 +204,6 @@ public class InventoryHandler implements IPluginEnabled
 		return returnEnchants;
 	}
 
-	@Deprecated
 	private ItemStack unpackItem(String itemString)
 	{
 		String[] itemData = itemString.split(":");
@@ -231,7 +219,7 @@ public class InventoryHandler implements IPluginEnabled
 		return itemStack;
 	}
 
-	private IRepository<InventoryStorage, RunsafePlayer> repository = null;
-	private IRepository<InventoryStorage, String> templates = null;
-	private IOutput console;
+	private final InventoryRepository repository;
+	private final TemplateRepository templates;
+	private final IOutput console;
 }

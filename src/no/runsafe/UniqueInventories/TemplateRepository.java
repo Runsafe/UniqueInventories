@@ -1,8 +1,7 @@
 package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.database.IDatabase;
-import no.runsafe.framework.database.IRepository;
-import no.runsafe.framework.database.ISchemaChanges;
+import no.runsafe.framework.database.Repository;
 import no.runsafe.framework.output.IOutput;
 
 import java.sql.PreparedStatement;
@@ -13,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
-public class TemplateRepository implements IRepository<InventoryStorage, String>, ISchemaChanges
+public class TemplateRepository extends Repository
 {
 	public TemplateRepository(IDatabase database, IOutput output, IUniverses universes)
 	{
@@ -22,7 +21,6 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 		this.universes = universes;
 	}
 
-	@Override
 	public InventoryStorage get(String world)
 	{
 		String inventoryName = universes.getInventoryName(world);
@@ -56,7 +54,6 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 		return null;
 	}
 
-	@Override
 	public void persist(InventoryStorage inventory)
 	{
 		try
@@ -83,7 +80,6 @@ public class TemplateRepository implements IRepository<InventoryStorage, String>
 		}
 	}
 
-	@Override
 	public void delete(InventoryStorage inventory)
 	{
 		try

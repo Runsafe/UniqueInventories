@@ -1,35 +1,40 @@
 package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.configuration.IConfiguration;
+import no.runsafe.framework.event.IConfigurationChanged;
 import no.runsafe.framework.output.IOutput;
 import no.runsafe.framework.server.RunsafeWorld;
-import org.bukkit.configuration.ConfigurationSection;
+import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.logging.Level;
+import java.util.List;
+import java.util.Map;
 
-public class InventoryUniverses implements IUniverses
+public class InventoryUniverses implements IUniverses, IConfigurationChanged
 {
-	public InventoryUniverses(IConfiguration config, IOutput output)
+	public InventoryUniverses(IOutput output)
 	{
-		ConfigurationSection grouping = config.getSection("groupedInventories");
-		groupedInventories = new HashMap<String, String>();
-		if (grouping == null)
-			return;
+		console = output;
+	}
 
-		Set<String> universes = grouping.getKeys(true);
-		if (universes == null)
-			return;
-
-		for (String universe : universes)
+	@Override
+	public void OnConfigurationChanged(IConfiguration configuration)
+	{
+		Map<String, List<String>> section = configuration.getConfigSectionsAsList("groupedInventories");
+		if (section == null || section.isEmpty())
 		{
-			for (String world : grouping.getStringList(universe))
-			{
-				groupedInventories.put(world, universe);
-				output.outputToConsole(String.format("Adding world %s to universe %s.", world, universe), Level.INFO);
-			}
+			console.writeColoured("&cNo universes loaded!");
+			return;
 		}
+		ArrayList<String> universes = new ArrayList<String>();
+		for (String name : section.keySet())
+		{
+			universes.add(String.format("{&6%s&r=&a%s&r}", name, StringUtils.join(section.get(name), "&r,&a")));
+			for (String world : section.get(name))
+				groupedInventories.put(world, name);
+		}
+		console.writeColoured("Loaded universes: %s", StringUtils.join(universes, " "));
 	}
 
 	@Override
@@ -47,5 +52,6 @@ public class InventoryUniverses implements IUniverses
 		return !getInventoryName(world.getName()).equals(getInventoryName(from.getName()));
 	}
 
-	private final HashMap<String, String> groupedInventories;
+	private final Map<String, String> groupedInventories = new HashMap<String, String>();
+	private final IOutput console;
 }
