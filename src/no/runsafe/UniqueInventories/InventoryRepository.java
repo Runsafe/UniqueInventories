@@ -59,7 +59,7 @@ public class InventoryRepository extends Repository
 		}
 		catch (SQLException e)
 		{
-			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
+			this.output.logException(e);
 		}
 		return null;
 	}
@@ -136,7 +136,7 @@ public class InventoryRepository extends Repository
 	private InventoryStorage createInventory(String playerName, String inventoryName, int stack) throws SQLException
 	{
 		InventoryStorage inv = new InventoryStorage();
-		PreparedStatement insert = this.database.prepare("INSERT INTO uniqueInventories (playerName, inventoryName, stack) VALUES (?, ?, ?)");
+		PreparedStatement insert = this.database.prepare("INSERT INTO uniqueInventories (playerName, inventoryName, stack, version) VALUES (?, ?, ?, ?)");
 		inv.setPlayerName(playerName);
 		inv.setWorldName(inventoryName);
 		inv.setSaved(true);

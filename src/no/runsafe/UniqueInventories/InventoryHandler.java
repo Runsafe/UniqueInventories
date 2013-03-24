@@ -27,6 +27,16 @@ public class InventoryHandler implements IPluginEnabled
 
 	public void saveInventory(RunsafePlayer player, RunsafeWorld theWorld)
 	{
+		if(player == null)
+		{
+			console.writeColoured("Player is NULL!");
+			return;
+		}
+		if(theWorld == null)
+		{
+			console.writeColoured("World is NULL!");
+			return;
+		}
 		InventoryStorage storage = repository.get(player, theWorld.getName());
 		storage.setPlayerName(player.getName());
 		storage.setWorldName(theWorld.getName());
