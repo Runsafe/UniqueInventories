@@ -48,6 +48,7 @@ public class InventoryRepository extends Repository
 				inv.setExperience(set.getFloat("experience"));
 				inv.setSaved(set.getBoolean("saved"));
 				inv.setStack(set.getInt("stack"));
+				inv.setVersion(set.getInt("version"));
 				inv.setInventoryYaml(set.getString("yaml_inventory"));
 			}
 			else
