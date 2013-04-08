@@ -2,98 +2,57 @@ package no.runsafe.UniqueInventories;
 
 import no.runsafe.framework.database.IDatabase;
 import no.runsafe.framework.database.Repository;
-import no.runsafe.framework.output.IOutput;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Map;
 
 public class TemplateRepository extends Repository
 {
-	public TemplateRepository(IDatabase database, IOutput output, IUniverses universes)
+	public TemplateRepository(IDatabase database, IUniverses universes)
 	{
 		this.database = database;
-		this.output = output;
 		this.universes = universes;
 	}
 
 	public InventoryStorage get(String world)
 	{
 		String inventoryName = universes.getInventoryName(world);
-		try
-		{
-			PreparedStatement select = this.database.prepare("SELECT * FROM uniqueInventoryTemplates WHERE inventoryName=?");
-			select.setString(1, inventoryName);
-			ResultSet set = select.executeQuery();
-			InventoryStorage inv = new InventoryStorage();
-			if (set.first())
-			{
-				inv.setPlayerName(null);
-				inv.setWorldName(set.getString("inventoryName"));
-				inv.setInventoryYaml(set.getString("inventory_yaml"));
-				inv.setLevel(set.getInt("level"));
-				inv.setExperience(set.getFloat("experience"));
-				inv.setSaved(true);
-				inv.setStack(0);
-			}
-			else
-			{
-				inv = createInventory(inventoryName);
-			}
-			select.close();
-			return inv;
-		}
-		catch (SQLException e)
-		{
-			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
-		}
-		return null;
+		Map<String, Object> template = database.QueryRow(
+			"SELECT * FROM uniqueInventoryTemplates WHERE inventoryName=?",
+			inventoryName
+		);
+		if (template == null)
+			return createInventory(inventoryName);
+		InventoryStorage inventory = new InventoryStorage();
+		inventory.setPlayerName(null);
+		inventory.setWorldName((String) template.get("inventoryName"));
+		inventory.setInventoryYaml((String) template.get("inventory_yaml"));
+		inventory.setLevel((Integer) template.get("level"));
+		inventory.setExperience((Float) template.get("experience"));
+		inventory.setSaved(true);
+		inventory.setStack(0);
+		return inventory;
 	}
 
 	public void persist(InventoryStorage inventory)
 	{
-		try
-		{
-			this.output.outputDebugToConsole(
-				String.format(
-					"Saving template inventory for world %s",
-					inventory.getWorldName()
-				),
-				Level.FINE
-			);
-			PreparedStatement update = this.database.prepare(
-				"UPDATE uniqueInventoryTemplates SET inventory_yaml=?, level=?, experience=? WHERE inventoryName=?"
-			);
-			update.setString(1, inventory.getInventoryYaml());
-			update.setLong(2, inventory.getLevel());
-			update.setFloat(3, inventory.getExperience());
-			update.setString(4, universes.getInventoryName(inventory.getWorldName()));
-			update.execute();
-		}
-		catch (SQLException e)
-		{
-			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
-		}
+		database.Update(
+			"UPDATE uniqueInventoryTemplates SET inventory_yaml=?, level=?, experience=? WHERE inventoryName=?",
+			inventory.getInventoryYaml(),
+			inventory.getLevel(),
+			inventory.getExperience(),
+			universes.getInventoryName(inventory.getWorldName())
+		);
 	}
 
 	public void delete(InventoryStorage inventory)
 	{
-		try
-		{
-			PreparedStatement delete = this.database.prepare(
-				"DELETE FROM uniqueInventoryTemplates WHERE inventoryName=?"
-			);
-			delete.setString(1, universes.getInventoryName(inventory.getWorldName()));
-			delete.execute();
-		}
-		catch (SQLException e)
-		{
-			this.output.outputToConsole(e.getMessage(), Level.SEVERE);
-		}
+		database.Execute(
+			"DELETE FROM uniqueInventoryTemplates WHERE inventoryName=?",
+			universes.getInventoryName(inventory.getWorldName())
+		);
 	}
 
 	@Override
@@ -124,20 +83,19 @@ public class TemplateRepository extends Repository
 		return versions;
 	}
 
-	private InventoryStorage createInventory(String inventoryName) throws SQLException
+	private InventoryStorage createInventory(String inventoryName)
 	{
+		database.Update(
+			"INSERT INTO uniqueInventoryTemplates (inventoryName) VALUES (?)",
+			inventoryName
+		);
 		InventoryStorage inv = new InventoryStorage();
-		PreparedStatement insert = this.database.prepare("INSERT INTO uniqueInventoryTemplates (inventoryName) VALUES (?)");
 		inv.setPlayerName(null);
 		inv.setWorldName(inventoryName);
 		inv.setSaved(true);
-		insert.setString(1, inventoryName);
-		insert.executeUpdate();
-		insert.close();
 		return inv;
 	}
 
 	private final IDatabase database;
-	private final IOutput output;
 	private final IUniverses universes;
 }
