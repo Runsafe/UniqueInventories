@@ -10,7 +10,7 @@ import no.runsafe.framework.configuration.IConfigurationFile;
 public class Plugin extends RunsafeConfigurablePlugin implements IConfigurationFile
 {
 	@Override
-	protected void PluginSetup()
+	protected void pluginSetup()
 	{
 		addComponent(InventoryHandler.class);
 		addComponent(PlayerListener.class);
